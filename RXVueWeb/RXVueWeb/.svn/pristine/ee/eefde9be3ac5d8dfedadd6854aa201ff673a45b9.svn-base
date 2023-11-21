@@ -1,0 +1,10 @@
+<meta charset="utf-8">
+<title>el-table-horizontal-scroll demo</title>
+<script src="./el-table-horizontal-scroll.umd.js"></script>
+
+<link rel="stylesheet" href="./el-table-horizontal-scroll.css">
+
+
+<script>
+console.log(el-table-horizontal-scroll)
+</script>

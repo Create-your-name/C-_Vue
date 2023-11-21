@@ -1,0 +1,95 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+using System.Data;
+using webapi.Models;
+using System.Linq;
+using Microsoft.AspNetCore.Cors;
+using webapi.Bean;
+using static webapi.Bean.FormData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+
+namespace webapi.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class DepartMentController : ControllerBase
+    {
+
+        private readonly ModelContext _context;
+
+        [HttpGet]
+        [EnableCors("DepartMent")]
+        public IEnumerable<RxFormProductUnusual> GetAll()
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+                var Department = ctx.RxFormProductUnusuals.ToList();
+                foreach (var Depart in Department) if (!String.IsNullOrEmpty(Depart.No)) Depart.No += "_异常单";
+                return Department;
+            }
+        }
+
+        [HttpPost("Lot")]
+        [EnableCors("DepartMent")]
+        public List<RxFormProductUnusual> GetLotALL(Bean.FormData.Data Data)
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+       /*         var Task = (from Depart in ctx.RxFormProductUnusuals
+                            join Time in ctx.BpmiTokens on Depart.Taskid equals Time.Taskid into temp1
+                            from t1 in temp1.DefaultIfEmpty()
+                            select new { Depart.Taskid }
+                            );*/
+            /*    var Task =ctx.RxFormProductUnusuals.Form
+*/
+
+                /*   .Where(e => String.IsNullOrEmpty(Data.f_Cause_Range) ? true : e.Ycyygl == Data.f_Cause_Range)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Equip_ID) ? true : e.Equipid == Data.f_Equip_ID)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Idea) ? true : e.CpownerQryj == Data.f_Idea)
+                   .Where(e => String.IsNullOrEmpty(Data.f_LOT) ? true : e.Ph == Data.f_LOT)
+                   .Where(e => String.IsNullOrEmpty(Data.f_OP_Class) ? true : e.YcclFl == Data.f_OP_Class)
+                   .Where(e => String.IsNullOrEmpty(Data.f_OP_Depart) ? true : e.YcclBm == Data.f_OP_Depart)
+                   .Where(e => String.IsNullOrEmpty(Data.f_OP_Level) ? true : e.Ycclcc == Data.f_OP_Level)
+                   .Where(e => String.IsNullOrEmpty(Data.f_OP_Pheno) ? true : e.Zxyc == Data.f_OP_Pheno)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Pro) ? true : e.Gy == Data.f_Pro)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Pro_Kind) ? true : true)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Product_name) ? true : e.Cppz == Data.f_Product_name)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart) ? true : e.Clbm == Data.f_Res_Depart)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart_2) ? true : true)
+                   .Where(e => String.IsNullOrEmpty(Data.f_Yc_Odd) ? true : e.No == Data.f_Yc_Odd)*/
+                    
+
+                var Find_DePartMent = ctx.RxFormProductUnusuals
+                 /*   .Include(c => c.Taskid)
+                    .Where(e=> String.IsNullOrEmpty(Data.f_YC_DataFill[0]) ? true :e.ApplyDate.CompareTo(Data.f_YC_DataFill[0]) >0)*/
+                    /*.Where()*/
+                    .Where(e => String.IsNullOrEmpty(Data.f_Cause_Range) ? true : e.Ycyygl == Data.f_Cause_Range)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Equip_ID) ? true : e.Equipid == Data.f_Equip_ID)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Idea) ? true : e.CpownerQryj == Data.f_Idea)
+                    .Where(e => String.IsNullOrEmpty(Data.f_LOT) ? true : e.Ph == Data.f_LOT)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Class) ? true : e.YcclFl == Data.f_OP_Class)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Depart) ? true : e.YcclBm == Data.f_OP_Depart)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Level) ? true : e.Ycclcc == Data.f_OP_Level)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Pheno) ? true : e.Zxyc == Data.f_OP_Pheno)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Pro) ? true : e.Gy == Data.f_Pro)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Pro_Kind) ? true : true)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Product_name) ? true : e.Cppz == Data.f_Product_name)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart) ? true : e.Clbm == Data.f_Res_Depart)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart_2) ? true : true)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Yc_Odd) ? true : e.No == Data.f_Yc_Odd)
+
+
+              /*    .Where(e => Data.f_bf_NoNull ? true : e.Ph == Data.f_bf_NoNull)
+              * .Where(e => String.IsNullOrEmpty(Data.f_ReHu) ? true : e.Ph == Data.f_ReHu)
+              .Where(e => String.IsNullOrEmpty(Data.status) ? true : e.Ph == Data.status)*/
+              .ToList();
+
+                return Find_DePartMent;
+            }
+        }
+
+        /*        public record FormData( String data);*/
+    }
+}

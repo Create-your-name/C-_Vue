@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
+namespace webapi.Models;
+
+public partial class ModelContext : DbContext
+{
+    public ModelContext()
+    {
+    }
+
+    public ModelContext(DbContextOptions<ModelContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<BpmiToken> BpmiTokens { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseOracle("Data Source=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST =10.163.80.13)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = orcl)));User ID=rxmesuser;Password=rxmesuser;");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .HasDefaultSchema("RXMESUSER")
+            .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<BpmiToken>(entity =>
+        {
+            entity.HasKey(e => e.Tokenid).HasName("BPMI_TOKENPK1");
+
+            entity.ToTable("BPMI_TOKEN", "RXBPM");
+
+            entity.HasIndex(e => e.Actorid, "BPMI_TOKENACTOR2ID");
+
+            entity.HasIndex(e => e.Taskid, "BPMI_TOKENTASK11ID");
+
+            entity.HasIndex(e => e.Transitionid, "BPMI_TOKENTR11ID");
+
+            entity.HasIndex(e => new { e.Formid, e.Result, e.Tokenname }, "BPMI_TOKEN_INDEX01");
+
+            entity.Property(e => e.Tokenid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TOKENID");
+            entity.Property(e => e.Activityid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ACTIVITYID");
+            entity.Property(e => e.Actorid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ACTORID");
+            entity.Property(e => e.Curdeptname)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("CURDEPTNAME");
+            entity.Property(e => e.Curusername)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("CURUSERNAME");
+            entity.Property(e => e.Elementtype)
+                .HasPrecision(10)
+                .HasColumnName("ELEMENTTYPE");
+            entity.Property(e => e.Expiretime)
+                .HasColumnType("DATE")
+                .HasColumnName("EXPIRETIME");
+            entity.Property(e => e.Finishtime)
+                .HasColumnType("DATE")
+                .HasColumnName("FINISHTIME");
+            entity.Property(e => e.Formid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("FORMID");
+            entity.Property(e => e.Fromaccount)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMACCOUNT");
+            entity.Property(e => e.Fromusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMUSERNAME");
+            entity.Property(e => e.Isrecede)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("ISRECEDE");
+            entity.Property(e => e.Lastnotifytime)
+                .HasColumnType("DATE")
+                .HasColumnName("LASTNOTIFYTIME");
+            entity.Property(e => e.Notifyfrequence)
+                .HasColumnType("FLOAT")
+                .HasColumnName("NOTIFYFREQUENCE");
+            entity.Property(e => e.Processcode)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSCODE");
+            entity.Property(e => e.Progressstatus)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("PROGRESSSTATUS");
+            entity.Property(e => e.Receivetime)
+                .HasDefaultValueSql("sysdate")
+                .HasColumnType("DATE")
+                .HasColumnName("RECEIVETIME");
+            entity.Property(e => e.Recyclelevel)
+                .HasPrecision(10)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("RECYCLELEVEL");
+            entity.Property(e => e.Remark)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("REMARK");
+            entity.Property(e => e.Result)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("RESULT");
+            entity.Property(e => e.Showinlist)
+                .HasPrecision(2)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("SHOWINLIST");
+            entity.Property(e => e.Standardtime)
+                .HasDefaultValueSql("0")
+                .HasColumnType("NUMBER(10,2)")
+                .HasColumnName("STANDARDTIME");
+            entity.Property(e => e.Systemid)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValueSql("'DEFAULT' ")
+                .HasColumnName("SYSTEMID");
+            entity.Property(e => e.Taskid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TASKID");
+            entity.Property(e => e.Tokenname)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("TOKENNAME");
+            entity.Property(e => e.Tokenstatus)
+                .HasPrecision(10)
+                .HasColumnName("TOKENSTATUS");
+            entity.Property(e => e.Transitionid)
+                .HasMaxLength(800)
+                .IsUnicode(false)
+                .HasColumnName("TRANSITIONID");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}

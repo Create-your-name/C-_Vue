@@ -1,0 +1,26 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using webapi.Bean.Rep;
+using webapi.Models;
+
+namespace webapi.Controllers.Rep
+{
+    [Route("api/Rep")]
+    public class HotLotController 
+    {
+        [HttpPost("HotLot")]
+        public List<FabLot> GetHotLot()
+        {
+            List<FabLot> fabLots = new List<FabLot> { };
+
+            using (RxrepContext ctx = new RxrepContext()) {
+                WipMoveBean dep;
+               var a = ctx.VMfgHoldLastests.FromSqlInterpolated($@"select * from V_MFG_HOLD_LASTEST  ")
+                    .ToList();
+                
+            }
+                return fabLots;
+        }
+
+    }
+}

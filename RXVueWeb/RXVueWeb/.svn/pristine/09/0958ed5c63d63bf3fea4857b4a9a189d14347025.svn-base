@@ -1,0 +1,746 @@
+<template>
+    <div style="display: flex;">
+        <div id="MounthChart" ref="MounthChart" class="chart"
+             style="width: 70%;
+                height: 400px;
+                margin-bottom: 20px;
+                background: rgba(237, 255, 255, 1);">
+        </div>
+        <div id="YearChart" ref="YearChart" class="chart"
+             style="width: 31%;
+                height: 400px;
+                margin-bottom: 20px;
+                background: rgba(237, 255, 255, 1);">
+        </div>
+    </div>
+    <div style="display: flex;">
+        <div id="MounthOut" ref="MounthOut" class="chart"
+             style="width: 70%;
+                height: 400px;
+                margin-bottom: 20px;
+                background: rgba(237, 255, 255, 1);">
+        </div>
+        <div id="YearOut" ref="YearOut" class="chart"
+             style="width: 31%;
+                height: 400px;
+                margin-bottom: 20px;
+                background: rgba(237, 255, 255, 1);">
+        </div>
+    </div>
+</template>
+<script>
+    import { reactive, onMounted } from 'vue';
+    import axios from 'axios';
+    import * as echarts from 'echarts';
+
+    export default {
+        setup() {
+            let data = reactive({});
+            let xdata = reactive([]);
+            let ydata = reactive([]);
+            let day = reactive([]);
+            let today = 0;
+
+            async function GetData() {
+                try {
+                 // const res = await axios.get("https://localhost:7155/api/Charts/Date");
+                    const res = await axios.get("http://10.163.76.23/api/api/Charts/Date");
+                    data.value = res.data;
+                    console.log(data);
+                    day = res.data.map(v => v.dateDay).slice();
+                    var currentDate = new Date();
+                    today = currentDate.getDate();
+                    console.log(today);
+                    //        console.log(day);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+
+            async function GetChartsList() {
+                try {
+                   //    const res = await axios.get("https://localhost:7155/api/Charts/Product");
+                       const res = await axios.get("http://10.163.76.23/api/api/Charts/Product");
+                    data.value = res.data;
+                    //       console.log(data);
+                    xdata = res.data.map(v => v.title).slice();
+                    ydata = res.data.map(v => v.num).slice();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            onMounted(async () => {
+                await GetChartsList().then(async () => {
+                    await GetData();
+                    let myChart = echarts.init(document.getElementById("MounthChart"));
+                    let Year = echarts.init(document.getElementById("YearChart"));
+                    let WaferOut = echarts.init(document.getElementById("MounthOut"));
+                    let YearOut = echarts.init(document.getElementById("YearOut"));
+
+                    WaferOut.setOption({
+                        title: [{
+                            text: 'Wafer Out',
+                            textStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontSize: 30
+                            },
+
+                        },
+                        {
+                            left: "1100px",
+                            subtext: 'MTD GAP: ' + (ydata[16][today - 2] - ydata[13][today - 2]) + '\n\n' + 'ACC Act: ' + ydata[13][today - 2] + '\n' + 'ACC target: ' + ydata[16][today - 2],
+                            subtextStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontWeight: 'bold',
+                                fontSize: 15
+                            },
+                        }
+                        ],
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow',
+                            },
+                        },
+                        legend: {
+                            show: true,
+                        },
+                        grid: {
+                            left: '2%',
+                            right: '%',
+                            bottom: '3%',
+                            containLabel: true,
+                        },
+                        xAxis: [
+                            {
+                                type: 'category',
+                                data: day,
+                                axisTick: {
+                                    show: false,
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '单位：片',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                            {
+                                type: 'value',
+                                position: 'right',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                }, label: {
+                                    show: true,
+                                    position: 'top',
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        series: [
+
+                            {
+                                name: xdata[13],
+                                data: ydata[13],
+                                yAxisIndex: 1,
+                                color: '#FD3F3F',
+                                type: 'line'
+                            },
+                            {
+                                name: xdata[14],
+                                data: ydata[14],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#73D1F1',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[15],
+                                data: ydata[15],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#EA2E2E',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[16],
+                                data: ydata[16],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#79B8F0',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[10],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#B29E60' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[10]
+                            },
+                            {
+                                name: xdata[11],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#85C1EE' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[11],
+                            },
+                            {
+                                name: xdata[12],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#EC7DB6' },
+                                },
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'top',
+                                        formatter: function (params) {
+                                            return params.value + ydata[10][params.dataIndex] + ydata[11][params.dataIndex]
+                                        },
+                                        textStyle: { color: '#000' }
+                                    }
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[12],
+
+                            },
+
+                        ],
+                    });
+
+                    YearOut.setOption({
+                        title: {
+                            text: 'MP',
+                            textStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontSize: 30
+                            },
+
+                        },
+
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow',
+                            },
+                        },
+                        legend: {
+                            show: true,
+                        },
+                        grid: {
+                            left: '2%',
+                            right: '2%',
+                            bottom: '3%',
+                            containLabel: true,
+                        },
+                        xAxis: [
+                            {
+                                type: 'category',
+                                data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                                axisTick: {
+                                    show: false,
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '单位：片',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        series: [
+                            {
+                                name: xdata[17],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#B29E60' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+
+                                data: ydata[17],
+                            },
+                            {
+                                name: xdata[18],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#85C1EE' },
+                                },
+
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[18],
+                            },
+                            {
+                                name: xdata[19],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#EC7DB6' },
+                                },
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'top',
+                                        formatter: function (params) {
+                                            return params.value + ydata[18][params.dataIndex] + ydata[17][params.dataIndex]
+                                        },
+                                        textStyle: { color: '#000' }
+                                    }
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[19],
+                            }
+                        ],
+                    });
+
+                    Year.setOption({
+                        title: {
+                            text: 'MP',
+                            textStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontSize: 30
+                            },
+
+                        },
+
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow',
+                            },
+                        },
+                        legend: {
+                            show: true,
+                        },
+                        grid: {
+                            left: '2%',
+                            right: '2%',
+                            bottom: '3%',
+                            containLabel: true,
+                        },
+                        xAxis: [
+                            {
+                                type: 'category',
+                                data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                                axisTick: {
+                                    show: false,
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '单位：片',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        series: [
+                            {
+                                name: xdata[7],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#B29E60' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+
+                                data: ydata[7],
+                            },
+                            {
+                                name: xdata[8],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#85C1EE' },
+                                },
+
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[8],
+                            },
+                            {
+                                name: xdata[9],
+                                type: 'bar',
+                                stack: 'email',
+                                barWidth: 14,
+                                itemStyle: { // 自定义柱子颜色
+                                    normal: { color: '#EC7DB6' },
+                                },
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'top',
+                                        formatter: function (params) {
+                                            return params.value + ydata[8][params.dataIndex] + ydata[7][params.dataIndex]
+                                        },
+                                        textStyle: { color: '#000' }
+                                    }
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[9],
+                            }
+                        ],
+                    });
+                    //  本月
+                    myChart.setOption({
+                        title: [{
+                            text: 'Wafer Start',
+                            textStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontSize: 30
+                            },
+
+                        },
+                        {
+                            left: "1100px",
+                            subtext: 'MTD GAP: ' + (ydata[6][today - 2] - ydata[3][today - 2]) + '\n\n' + 'ACC Act: ' + ydata[3][today - 2] + '\n' + 'ACC target: ' + ydata[6][today - 2],
+                            subtextStyle: {
+                                fontFamily: 'Microsoft YaHei',
+                                fontWeight: 'bold',
+                                fontSize: 15
+                            },
+                        }
+                        ],
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow',
+                            },
+                        },
+                        legend: {
+                            show: true,
+                        },
+                        grid: {
+                            left: '2%',
+                            right: '%',
+                            bottom: '3%',
+                            containLabel: true,
+                        },
+                        xAxis: [
+                            {
+                                type: 'category',
+                                data: day,
+                                axisTick: {
+                                    show: false,
+                                },
+                                axisLine: {
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                                name: '单位：片',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                            {
+                                type: 'value',
+                                position: 'right',
+                                nameTextStyle: {
+                                    color: 'rgba(0, 0, 0, 0.6)',
+                                    fontSize: 12,
+                                },
+                                axisLine: {
+                                    show: true,
+                                    lineStyle: {
+                                        color: '#D5DDE7',
+                                    },
+                                }, label: {
+                                    show: true,
+                                    position: 'top',
+                                },
+                                axisLabel: {
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                    fontSize: 12,
+                                },
+                            },
+                        ],
+                        series: [
+
+                            {
+                                name: xdata[3],
+                                data: ydata[3],
+                                yAxisIndex: 1,
+                                color: '#FD3F3F',
+                                type: 'line'
+                            },
+                            {
+                                name: xdata[4],
+                                data: ydata[4],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#73D1F1',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[5],
+                                data: ydata[5],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#EA2E2E',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[6],
+                                data: ydata[6],
+                                yAxisIndex: 1,
+                                type: 'line',
+                                smooth: false,
+                                itemStyle: {
+                                    normal: {
+                                        color: '#79B8F0',
+                                        lineStyle: {
+                                            width: 2,
+                                            type: 'dotted'
+                                        }
+                                    }
+                                },
+
+                            },
+                            {
+                                name: xdata[0],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#B29E60' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[0]
+                            },
+                            {
+                                name: xdata[1],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#85C1EE' },
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[1],
+                            },
+                            {
+                                name: xdata[2],
+                                type: 'bar',
+                                stack: '总量',
+                                barWidth: 14,
+                                itemStyle: {
+                                    normal: { color: '#EC7DB6' },
+                                },
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'top',
+                                        formatter: function (params) {
+                                            return params.value + ydata[1][params.dataIndex] + ydata[0][params.dataIndex]
+                                        },
+                                        textStyle: { color: '#000' }
+                                    }
+                                },
+                                emphasis: {
+                                    focus: 'series',
+                                },
+                                data: ydata[2],
+
+                            },
+
+                        ],
+                    });
+                });
+            });
+
+            return {
+                GetChartsList,
+                GetData,
+                data,
+                xdata,
+                ydata,
+                day,
+            };
+        },
+    };
+
+</script>

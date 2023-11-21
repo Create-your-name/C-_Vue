@@ -1,0 +1,46 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Linq;
+using Microsoft.AspNetCore.Cors;
+using webapi.Bean;
+using static webapi.Bean.FormPro;
+using webapi.Models;
+
+namespace webapi.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class DepartMentController : ControllerBase
+    {
+
+        private readonly ModelContext _context;
+
+        [HttpGet]
+        [EnableCors("DepartMent")]
+        public IEnumerable<RxFormProductUnusual> GetAll()
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+                var Department = ctx.RxFormProductUnusuals.ToList();
+            /*    foreach (var Depart in Department) if (!Depart.No.I)*/
+               /* foreach (var Depart in Department) if (!Depart.No.IsNullOrEmpty(Depart.No)) Depart.No += "异常单";*/
+                return Department;
+            }
+        }
+
+        [HttpPost("Lot")]
+        [EnableCors("DepartMent")]
+        public List<RxFormProductUnusual> GetLotALL(FormData Data)
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+                var Find_DePartMent = ctx.RxFormProductUnusuals.Where(e => e.Gy == Data.f_Pro && e.Ph == Data.f_LOT).ToList();
+
+                return Find_DePartMent;
+            }
+        }
+
+        /*        public record FormData( String data);*/
+    }
+}

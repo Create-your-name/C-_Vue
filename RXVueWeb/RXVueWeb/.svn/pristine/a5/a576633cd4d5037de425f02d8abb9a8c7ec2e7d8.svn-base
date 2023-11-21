@@ -1,0 +1,23 @@
+﻿using NPOI.POIFS.Properties;
+using webapi.Models;
+
+namespace webapi.Bean
+{
+    public class FromShow:RxFormProductUnusual
+    {
+        //1 异常放行  2 返工 3 报废 4 正常放行
+
+        //Z 代表  再处理
+        public string? C1 { get; set; }
+        public string? C2 { get; set; }
+        public string? C3 { get; set; }
+
+        public string? C4 { get; set; }
+
+        public string? Z1 { get; set; }
+        public string? Z2 { get; set; }
+        public string? Z3 { get; set; }
+        public string? Z4 { get; set; }
+
+    }
+}

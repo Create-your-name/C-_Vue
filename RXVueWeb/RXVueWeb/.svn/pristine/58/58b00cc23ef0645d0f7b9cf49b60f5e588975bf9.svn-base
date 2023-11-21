@@ -1,0 +1,34 @@
+﻿using NPOI.POIFS.Properties;
+using webapi.Models;
+
+namespace webapi.Bean
+{
+    public class FromShow:RxFormProductUnusual
+    {
+      /*  public FormData(RxFormProductUnusual Rx)
+        {
+            var parentProperties = Rx.GetType().GetProperties();
+            foreach (var parentProperty in parentProperties)
+            {
+                var thisProperty = this.GetType().GetProperty(parentProperty.Name, parentProperty.PropertyType);
+                var value = parentProperty.GetValue(Rx);
+                if (thisProperty != null && value != null && thisProperty.CanWrite)
+                {
+                    thisProperty.SetValue(this, value);
+                }
+            }
+        }
+*/
+        string? C1 { get; set; }
+        string? C2 { get; set; }
+        string? C3 { get; set; }
+
+        string? C4 { get; set; }
+
+        string? Z1 { get; set; }
+        string? Z2 { get; set; }
+        string? Z3 { get; set; }
+        string? Z4 { get; set; }
+
+    }
+}

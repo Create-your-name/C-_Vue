@@ -1,0 +1,9 @@
+﻿namespace webapi.Bean.Chart
+{
+    public class DateFrom
+    {
+
+        public string DateDay { get; set; }
+
+    }
+}

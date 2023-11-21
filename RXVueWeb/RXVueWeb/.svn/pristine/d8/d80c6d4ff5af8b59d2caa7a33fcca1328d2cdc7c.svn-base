@@ -1,0 +1,173 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace webapi.Entity.Rxrep2;
+
+public partial class RepHistTot
+{
+    public string Histkey { get; set; } = null!;
+
+    public string? Lotid { get; set; } = null!;
+
+    public DateTime? Reltime { get; set; }
+
+    public string? Lottype { get; set; }
+
+    public string? Parentid { get; set; }
+
+    public string? Partname { get; set; }
+
+    public string? Partid { get; set; }
+
+    public string? Capability { get; set; }
+
+    public string? Prcdkey { get; set; }
+
+    public string? Partversion { get; set; }
+
+    public string? Location { get; set; }
+
+    public string? Locationtype { get; set; }
+
+    public string? Prodarea { get; set; }
+
+    public string? Stage { get; set; }
+
+    public string? Recpname { get; set; }
+
+    public string? Recpversion { get; set; }
+
+    public string? Recpid { get; set; }
+
+    public string? Eqptype { get; set; }
+
+    public string? Eqpid { get; set; }
+
+    public string? Empidtrackin { get; set; }
+
+    public string? Empidtrackout { get; set; }
+
+    public string? Curprcdstage { get; set; }
+
+    public DateTime? Histtime { get; set; }
+
+    public decimal? Priority { get; set; }
+
+    public decimal? Curmainqty { get; set; }
+
+    public decimal? Cursubqty { get; set; }
+
+    public string? Curprcdcurinstnum { get; set; }
+
+    public DateTime? Queuetime { get; set; }
+
+    public DateTime? Trackintime { get; set; }
+
+    public DateTime? Startrecptime { get; set; }
+
+    public DateTime? Endrecptime { get; set; }
+
+    public DateTime? Trackouttime { get; set; }
+
+    public decimal? Trackinmainqty { get; set; }
+
+    public decimal? Reworkcyclecount { get; set; }
+
+    public decimal? Totalreworkcyclecount { get; set; }
+
+    public decimal? Testcount { get; set; }
+
+    public string? Curreworkmattype { get; set; }
+
+    public decimal? Evcount { get; set; }
+
+    public DateTime? Lastevtime { get; set; }
+
+    public decimal? Lastevendmainqty { get; set; }
+
+    public string? Lastevtype { get; set; }
+
+    public string? Lastevuser { get; set; }
+
+    public string? Lastevstate { get; set; }
+
+    public string? Lastevvariant { get; set; }
+
+    public decimal? Tempparmcount { get; set; }
+
+    public DateTime? Repdate { get; set; }
+
+    public string? Pcode { get; set; }
+
+    public string? Replott { get; set; }
+
+    public string? Process { get; set; }
+
+    public string? Processtype { get; set; }
+
+    public string? Repstage { get; set; }
+
+    public string? Prodstage { get; set; }
+
+    public decimal? RepstageSort { get; set; }
+
+    public decimal? ProdstageSort { get; set; }
+
+    public string? Module { get; set; }
+
+    public decimal? Theoct { get; set; }
+
+    public decimal? Theoqty { get; set; }
+
+    public decimal? Prodct { get; set; }
+
+    public decimal? PhotoSort { get; set; }
+
+    public decimal? PhotoMax { get; set; }
+
+    public decimal? SortFlow { get; set; }
+
+    public decimal? Maxflowstep { get; set; }
+
+    public string? Type { get; set; }
+
+    public string? BatchFlag { get; set; }
+
+    public string? CapaGroup { get; set; }
+
+    public string? Class1 { get; set; }
+
+    public string? Class2 { get; set; }
+
+    public string? Class3 { get; set; }
+
+    public string? Class4 { get; set; }
+
+    public DateTime? Reqdtime { get; set; }
+
+    public string? Vflag { get; set; }
+
+    public DateTime? ModifyReqdtime { get; set; }
+
+    public DateTime? Outdate { get; set; }
+
+    public decimal? Newpriority { get; set; }
+
+    public decimal? Taxis { get; set; }
+
+    public string? Processver { get; set; }
+
+    public string? Callprcdid { get; set; }
+
+    public string? Nextstep { get; set; }
+
+    public string? Priocat { get; set; }
+
+    public decimal? Whold { get; set; }
+
+    public decimal? Rhold { get; set; }
+
+    public decimal? Tthold { get; set; }
+
+    public decimal? Cushold { get; set; }
+}

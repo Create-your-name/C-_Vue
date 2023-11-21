@@ -1,0 +1,54 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace webapi.Models
+{
+    public class BpmiTask 
+    {
+        public string? Taskid { get; set; }
+
+        public string? Taskname { get; set; }
+
+        public string? Processid { get; set; }
+
+        public string? Roottokenid { get; set; }
+
+        public string? Inituserid { get; set;  }
+
+        public string? Taskstatus { get; set; }
+
+        public string? Taskpriority { get; set; }
+
+        public DateTime? Begintime { get; set; }
+
+        public DateTime? Finishtime { get; set; }
+
+        public int? TaskResult { get; set; }
+
+        public byte? Isenable { get; set; }
+
+        public string? Parenttokenid { get; set; }
+
+        public string? Initusername{ get; set; }
+
+        public string? Inituserdept { get; set; }
+
+        public string? Processname { get; set; }
+
+        public string? column1 { get; set; }
+        public string? column2 { get; set; }
+        public string? column3 { get; set; }
+        public string? column4 { get; set; }
+        public string? column5 { get; set; }
+        public string? column6 { get; set; }
+
+        public string? Modulecode { get; set; }
+
+        public byte? Simulate { get; set; }
+
+        public string? Processcode { get; set; }
+
+        public string? Parentserver { get; set; }
+
+        public string? Parentsystemid { get; set; }
+    } 
+}

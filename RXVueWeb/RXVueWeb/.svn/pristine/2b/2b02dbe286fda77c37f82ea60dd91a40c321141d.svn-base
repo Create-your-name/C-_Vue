@@ -1,0 +1,32 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace webapi.Bean.Month
+{
+     public class PcMonth : Controller
+    {
+         public record PC(
+         string? GYDL,
+         int? BP投料目标PCS,
+         int? BP投料目标KLayer,
+         int? BP投料计划WSAccPlan,
+         int? BP投料计划WSAccPlan_K_L,
+         int? MF1_6投料目标MFPCS,
+         int? MF1_6投料目标MF_KLayer,
+         int? MF1_6投料计划WS_Acc_Plan,
+         int? MF1_6投料计划WS_Acc_Plan_K_L
+
+        );
+
+        public record FabIndex(
+
+       int? DailyMOVE,
+       int? OutPut,
+       int? PhotoOut,
+       int? WaferStart
+
+      );
+
+
+    }
+
+}

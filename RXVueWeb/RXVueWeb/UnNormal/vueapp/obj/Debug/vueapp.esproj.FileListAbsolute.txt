@@ -1,0 +1,6 @@
+C:\Users\liuhai82\source\repos\UnNormal\vueapp\obj\Debug\vueapp.esproj.SuggestedBindingRedirects.cache
+C:\Users\liuhai82\source\repos\UnNormal\vueapp\obj\Debug\vueapp.esproj.CoreCompileInputs.cache
+D:\RXVueWeb\UnNormal\vueapp\obj\Debug\vueapp.esproj.SuggestedBindingRedirects.cache
+D:\RXVueWeb\UnNormal\vueapp\obj\Debug\vueapp.esproj.CoreCompileInputs.cache
+D:\code\RXVueWeb\UnNormal\vueapp\obj\Debug\vueapp.esproj.SuggestedBindingRedirects.cache
+D:\code\RXVueWeb\UnNormal\vueapp\obj\Debug\vueapp.esproj.CoreCompileInputs.cache

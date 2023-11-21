@@ -1,0 +1,70 @@
+﻿
+using webapi.Service.SaveExcel;
+using webapi.Service.SendEmail;
+
+namespace webapi.Service.DynCTSummary_Email
+{
+    public class DayCTEmail
+    {
+        public  void SendDayCTEmail() {
+
+            Console.WriteLine("进入DayCt邮件");
+            String sBody= EmailBody();
+            Console.WriteLine("DayCtBody");
+            List<String> sendTO=new List<string>();
+            sendTO.Add("liuhai82@rxgz.crmicro.com");
+            /*  sendTO.Add("songxingxing15@rxgz.crmicro.com");
+             sendTO.Add("zhangzhenglu1@crmicro.com");
+             sendTO.Add("caolianying1@rxgz.crmicro.com");*/
+
+/*            sendTO.Add("runxin_shengchanyingyunbudep@rxgz.crmicro.com");
+            sendTO.Add("guojiahui@csmc.crmicro.com");
+            sendTO.Add("gaojw@csmc.crmicro.com");*/
+
+
+            List<String> SendCC=new List<string>();
+/*            SendCC.Add("zhangzhenglu1@crmicro.com");
+            SendCC.Add("liuhai82@rxgz.crmicro.com");*/
+            String fromEmail = "crmic_nc_MES_zy@rxgz.crmicro.com";
+            String fromPwd = "Rxmes@2023";
+            String fromName= " Dynamic Cycle Time Report_NEW";
+            String title= " Dynamic Cycle Time Report_NEW";
+            String Emailbody= sBody;
+            String ExcelPath = @"C:\TEST\DynCT_NEW.xlsx";
+
+            // List<String> sendTO,List<String> SendCC, String fromEmail, string fromPwd, String fromName, String title, String Emailbody,String ExcelName
+            //EmailServer SendEmail = new EmailServer()
+            EmailServer.SendEmail(sendTO, SendCC, fromEmail, fromPwd, fromName, title, Emailbody, ExcelPath);
+            Console.WriteLine("结束DayCt邮件");
+
+        }
+
+
+
+
+
+        public string  EmailBody() {
+            string EmailBody = "<font size=2 face=Arial color=red><b>润芯 Dynamic Cycle Time Report_NEW<b> <hr> ";
+            EmailBody += "<html><title></title><body> ";
+            EmailBody += "<table border=1 cellspacing=1 cellpadding=2 bgcolor=black width=700><tr bgcolor=SkyBlue ><font size=2 face=Arial color=black><td align=center colSpan=11><font size=2 face=Arial color=black>润芯</td></tr> ";
+            EmailBody += "<tr bgcolor=SkyBlue><td align=center width=100><font size=2 face=Arial color=black>DAY</td><td align=center width=60><font size=2 face=Arial color=black>WS</td><td align=center width=60><font size=2 face=Arial color=black>WO</td><td align=center width=60><font size=2 face=Arial color=black>WIP</td><td align=center width=60><font size=2 face=Arial color=black>HoldWIP</td><td align=center  width=60><font size=2 face=Arial color=black>StepMove</td><td align=center  width=60><font size=2 face=Arial color=black>TR</td><td align=center  width=60><font size=2 face=Arial color=black>CT</td><td align=center  width=60><font size=2 face=Arial color=black>BANK</td><td align=center  width=60><font size=2 face=Arial color=black>AVG step/layer</td> <td align=center  width=60><font size=2 face=Arial color=black>Scrap</td>  ";
+
+            //   數據編碼   針對潤興數據進行Show        
+
+            
+            DateTime currentDate = DateTime.Now;
+            DateTime LastDate = currentDate.AddDays(-32);
+            string ExcelPath = @"C:\TEST\DynCT_NEW.xlsx"; 
+            string Sheet= "DynCT_NEW"; 
+            List<String> RowList = new List<string>();
+            EmailBody += ExcelServer.SendExcel(ExcelPath, Sheet, RowList, currentDate, LastDate);
+            // 數據結束 
+            EmailBody += "</tr>   ";
+            EmailBody += "</table><br><br>";
+            EmailBody += "</BODY>";
+
+            return EmailBody;
+
+        }
+    }
+}

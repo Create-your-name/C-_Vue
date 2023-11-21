@@ -1,0 +1,28 @@
+/*import ocap from '@/view/o-cap.vue'
+import ListSelect from '@/view/ListSelect.vue'*/
+
+
+const routes = [
+    {
+        path: '/',
+        /*       component :ocap*/
+        redirect: '/o-cap'
+    },
+    {
+        name: "ocap",
+        path: "/o-cap",
+        component: () => import('@/view/o-cap.vue')
+    },
+    {
+        name: 'ListSelect',
+        path: '/ListSelect',
+        component:() => import ('@/view/ListSelect.vue')
+  /*      component: ListSelect*/
+    },
+    {
+        name: 'Tab',
+        path: '/SelectMenu',
+        component: () => import('@/view/SelectMenu.vue')
+    }
+];
+export default routes

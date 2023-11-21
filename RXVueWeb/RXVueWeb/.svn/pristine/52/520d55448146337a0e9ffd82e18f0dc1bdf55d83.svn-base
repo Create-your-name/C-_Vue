@@ -1,0 +1,29 @@
+/*import ocap from '@/view/o-cap.vue'*//*
+import ListSelect from '@/view/ListSelect.vue'*/
+
+
+const routes = [
+    {
+        path: '/',
+        redirect: '/o-cap'
+    },
+    {
+        name: "ocap",
+        path: "/o-cap",
+        component: () => import('@/view/o-cap.vue')
+    },
+    {
+        name: '/Tab',
+        path: '/Tab',
+        component: () => import('@/view/TabInfo.vue'),
+        props: (route) => ({
+            tableData: route.query.tableData,
+        })
+    },
+    {
+        name: '/2',
+        path: '/2',
+        component: () => import('@/components/Util/emailForm.vue'),
+    }
+];
+export default routes

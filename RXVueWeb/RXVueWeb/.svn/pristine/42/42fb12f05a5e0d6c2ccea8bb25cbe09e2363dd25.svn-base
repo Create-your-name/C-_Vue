@@ -1,0 +1,15 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using webapi.Model;
+
+namespace webapi.Config
+{
+    public class RxFormConfig : IEntityTypeConfiguration<RxFormProductUnusual>
+    {
+        public void Configure(EntityTypeBuilder<RxFormProductUnusual> builder)
+        {
+         /*   builder.ToTable("rx_form_product_unusual");
+            builder.Property(b => b.Taskid).HasMaxLength(128).IsUnicode().IsRequired();*/
+        }
+    }
+}

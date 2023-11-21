@@ -1,0 +1,14 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace webapi.Bean.Rep
+{
+    public class FabLot 
+    {
+        public record StageWipDate(
+
+             string? Process,
+             string? Product
+
+         );
+    }
+}

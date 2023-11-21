@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace webapi.Model;
+
+public partial class Waferstartemailmounth
+{
+    public string Process { get; set; } = null!;
+
+    public decimal? Bppcs { get; set; }
+
+    public decimal? Bpklayer { get; set; }
+
+    public decimal? Wsaccplan { get; set; }
+
+    public decimal? Wsaccplank { get; set; }
+
+    public decimal? Mfpcs { get; set; }
+
+    public decimal? Mfklayer { get; set; }
+
+    public decimal? Mfaccplan { get; set; }
+
+    public decimal? Mfaccplank { get; set; }
+}

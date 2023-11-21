@@ -1,0 +1,213 @@
+﻿using Aspose.Email.Clients.Exchange.WebService.Schema_2016;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using webapi.Bean;
+using webapi.Bean.Chart;
+using webapi.Entity;
+using webapi.Entity.Api;
+using webapi.Models;
+using webapi.Util;
+using static webapi.Bean.FormData;
+
+namespace webapi.Controllers.Charts
+{
+    [Route("api/Charts")]
+    [ApiController]
+    public class InputController : Controller
+    {
+
+        [HttpGet("Product")]
+        public List<ChartFrom> SelectProduct()
+        {
+            List<ChartFrom> result = new List<ChartFrom>();
+            using (RxmesContext ctx =new RxmesContext()) {
+               var GsProduct= ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) = 'GS'").Select(e=> e.Product)
+                    .ToList();
+               var NdProduct = ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) = 'ND'").Select(e => e.Product)
+                   .ToList();
+               var MeiProduct = ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) = 'MM'").Select(e => e.Product)
+                   .ToList();
+                using (RxrepContext ctx2 = new RxrepContext()) {
+                    // 假设基础数据中的日期字段为 StartDate
+                    var startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); // 获取本月的第一天
+                    var endDate = startDate.AddMonths(1).AddDays(-1); // 获取本月的最后一天
+
+                    var daysInMonth = Enumerable.Range(0, (endDate - startDate).Days + 1)
+                        .Select(offset => startDate.AddDays(offset))
+                        .ToList();
+
+                    var GsNumber = GsProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
+                    var NdNumber = NdProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
+                    var MeiNumber = MeiProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
+
+                    var GsData = daysInMonth.Select(day =>
+                    {
+                        var gsNumber = GsNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate,"yyyyMMdd HHmmssfff",CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                        return new
+                        {
+                            GsNumber = gsNumber,
+                        };
+                    }).ToList();
+
+                    var NdData = daysInMonth.Select(day =>
+                    {
+                        var ndNumber = NdNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                      
+                        return new
+                        {
+                            NdNumber = ndNumber,
+                        };
+                    }).ToList();
+
+                    var MeiData = daysInMonth.Select(day =>
+                    {
+                        var meiNumber = MeiNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+
+                        return new
+                        {
+                            MeiNumber = meiNumber
+                        };
+                    }).ToList();
+                    var sum = 0;
+                    var AccActData = daysInMonth.Select(day =>
+                    {
+                        var meiNumber = MeiNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                        var ndNumber = NdNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                        var gsNumber = GsNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+
+                        sum += Convert.ToInt32(meiNumber) + Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber);
+                        return new
+                        {
+
+                            AccActNumber = sum
+
+                        };
+                    }).ToList();
+
+                    string title = "GS";
+                    int[] number = GsData.Select(x => x.GsNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom chart = new ChartFrom(title, number);
+                    result.Add(chart);
+
+                    string title2 = "ND";
+                    int[] number2 = NdData.Select(x => x.NdNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom chart2 = new ChartFrom(title2, number2);
+                    result.Add(chart2);
+
+                    string title3 = "MEI";
+                    int[] number3 = MeiData.Select(x => x.MeiNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom chart3 = new ChartFrom(title3, number3);
+                    result.Add(chart3);
+
+                    string title4 = "ACC act";
+                    int[] number4 = AccActData.Select(x => x.AccActNumber).Select(Convert.ToInt32).ToArray();
+                    ChartFrom chart4 = new ChartFrom(title4, number4);
+                    result.Add(chart4);
+
+                    //一个月维护一次
+                    string title5 = "动态目标";
+                    int[] number5 = {};
+                    ChartFrom chart5 = new ChartFrom(title5,number5);
+                    result.Add(chart5);
+
+                    string title6 = "MP目标";
+                    int[] number6 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 60, 60, 60, 60, 60, 60, 60, 64, 52, 76, 76, 72, 76, 72, 72, 72, 24, 0 };
+                    ChartFrom chart6 = new ChartFrom(title6, number6);
+                    result.Add(chart6);
+
+                    string title7 = "Acc Target";
+                    int[] number7 = new int[number6.Length];
+                    number7[0] = number6[0];
+                    for (int i = 1; i < number6.Length; i++)
+                    {
+                        number7[i] = number7[i - 1] + number6[i];
+                    }
+
+                    ChartFrom chart7 = new ChartFrom(title7, number7);
+                    result.Add(chart7);
+
+
+
+                    //  年为单位
+
+                    var startDate2 = new DateTime(DateTime.Now.Year, 1, 1); // 获取本年的第一天
+                    var endDate2 =  startDate2.AddYears(1).AddDays(-1); ; // 获取本年的最后一天
+
+                    var monthsInYear = Enumerable.Range(0, 12)
+                        .Select(offset => startDate2.AddMonths(offset))
+                        .ToList();
+                    var GsMonth = monthsInYear.Select(month =>
+                    {
+                        var gsNumber = GsNumber.Where(e => DateTime.Parse( DateTime.ParseExact( e.Lotstartdate.Substring(0,6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM "))== DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
+                        
+                        return new
+                        {
+                            GsMNumber = gsNumber,
+                        };
+                    }).ToList();
+
+                    var NdMonth = monthsInYear.Select(month =>
+                    {
+                        var ndNumber = NdNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
+
+                        return new
+                        {
+                            NdNumber = ndNumber,
+                        };
+                    }).ToList();
+
+                    var MeiMonth = monthsInYear.Select(month =>
+                    {
+                        var meiNumber = MeiNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
+
+                        return new
+                        {
+                            MeiNumber = meiNumber
+                        };
+                    }).ToList();
+
+                    string Month = "GS";
+                    int[] Mnumber = GsMonth.Select(x => x.GsMNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom Mchart = new ChartFrom(Month, Mnumber);
+                    result.Add(Mchart);
+
+                    string Month2 = "ND";
+                    int[] Mnumber2 = NdMonth.Select(x => x.NdNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom Mchart2 = new ChartFrom(Month2, Mnumber2);
+                    result.Add(Mchart2);
+
+                    string Month3 = "MEI";
+                    int[] Mnumber3 = MeiMonth.Select(x => x.MeiNumber.GetValueOrDefault()).Select(Convert.ToInt32).ToArray();
+                    ChartFrom Mchart3 = new ChartFrom(Month3, Mnumber3);
+                    result.Add(Mchart3);
+                }
+            }
+
+                return result;
+        }
+
+        [HttpGet("Date")]
+        public List<DateFrom> Date()
+        {
+            List<DateFrom> result = new List<DateFrom>();
+            DateTime currentDate = DateTime.Now;
+            int year = currentDate.Year;
+            int month = currentDate.Month;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                DateTime date = new DateTime(year, month, day);
+                string formattedDate = date.ToString(date.ToString("M/d"));
+                DateFrom dateFrom = new DateFrom();
+                dateFrom.DateDay = formattedDate.Substring(0, formattedDate.Length);
+                result.Add(dateFrom);
+            }
+
+            return result;
+        }
+
+
+    }
+}

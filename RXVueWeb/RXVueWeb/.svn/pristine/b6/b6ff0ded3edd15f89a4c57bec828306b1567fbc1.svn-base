@@ -1,0 +1,75 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Data.SqlTypes;
+using webapi.Bean.Month;
+using webapi.Models;
+using webapi.Service.CMP_SPTS_Email;
+using webapi.Service.DynCTSummary_Email;
+
+namespace webapi.Controllers.Month
+{
+
+    [Route("api/PcMonth")]
+    [ApiController]
+    public class PcMonthController : Controller
+    {
+        [HttpPost("WaferStart")]
+        public string DbInsertWaferStart(PcMonth.PC PcMonth)
+        {
+            //  Wafer Start 邮件数据维护 
+            using (Rxrept2Context ctx = new Rxrept2Context()) {
+                var DelectInfo = ctx.Waferstartemailmounths.Where(e=>e.Process==PcMonth.GYDL).ToList();
+                if (DelectInfo.Count!=0) {
+                    string DeleteSql = "Delete From WaferStartEmailMounth WHERE PROCESS ='" + PcMonth.GYDL.ToString() + "'";
+                    ctx.Database.ExecuteSqlRaw(DeleteSql);
+                }
+                string sql = "INSERT INTO WaferStartEmailMounth (PROCESS, BPPCS, BPKLayer, WSAccPlan, WSAccPlanK, MFPCS, MFKLayer, MFAccPlan, MFAccPlanK)" +
+                    "VALUES('"+PcMonth.GYDL+"', " + PcMonth.BP投料目标PCS + "," +PcMonth.BP投料目标KLayer + "," +PcMonth.BP投料计划WSAccPlan +","+PcMonth.BP投料计划WSAccPlan_K_L+","
+                    + PcMonth.MF1_6投料目标MFPCS + "," +PcMonth.MF1_6投料目标MF_KLayer +","+PcMonth.MF1_6投料计划WS_Acc_Plan+","+PcMonth.MF1_6投料计划WS_Acc_Plan_K_L+")";
+                ctx.Database.ExecuteSqlRaw(sql);
+            }
+
+                // 返回成功消息
+                return "success";
+        }
+
+        [HttpPost("FabIndex")]
+        public string DbInsertFabIndex(PcMonth.FabIndex FabIndex)
+        {
+            //  FabIndex 数据维护 
+            using (RxrepContext ctx =new RxrepContext()) {
+                if (FabIndex.DailyMOVE!=1) {
+                    string DeleteSql = "Delete From RANDY_EPM_TAR  WHERE PTYPE ='DailyMOVE'";
+                    ctx.Database.ExecuteSqlRaw(DeleteSql);
+                    string sql = "insert into RANDY_EPM_TAR (PTYPE,MP,DAY1,DAY2,DAY3,DAY4,DAY5,DAY6,DAY7,DAY8,DAY9,DAY10,DAY11,DAY12,DAY13,DAY14,DAY15,DAY16,DAY17,DAY18,DAY19,DAY20,DAY21,DAY22,DAY23,DAY24,DAY25,DAY26,DAY27,DAY28,DAY29,DAY30,DAY31,Repdate) VALUES ('DailyMOVE',"+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+","+FabIndex.DailyMOVE+",sysdate)";
+                    ctx.Database.ExecuteSqlRaw(sql);
+                }
+                if (FabIndex.WaferStart != 1)
+                {
+                    string DeleteSql = "Delete From RANDY_EPM_TAR  WHERE PTYPE ='WaferStart'";
+                    ctx.Database.ExecuteSqlRaw(DeleteSql);
+                    string sql = "insert into RANDY_EPM_TAR (PTYPE,MP,DAY1,DAY2,DAY3,DAY4,DAY5,DAY6,DAY7,DAY8,DAY9,DAY10,DAY11,DAY12,DAY13,DAY14,DAY15,DAY16,DAY17,DAY18,DAY19,DAY20,DAY21,DAY22,DAY23,DAY24,DAY25,DAY26,DAY27,DAY28,DAY29,DAY30,DAY31,Repdate) VALUES ('WaferStart'," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + "," + FabIndex.WaferStart + ",sysdate)";
+                    ctx.Database.ExecuteSqlRaw(sql);
+                }
+                if (FabIndex.OutPut != 1)
+                {
+                    string DeleteSql = "Delete From RANDY_EPM_TAR  WHERE PTYPE ='OutPut'";
+                    ctx.Database.ExecuteSqlRaw(DeleteSql);
+                    string sql = "insert into RANDY_EPM_TAR (PTYPE,MP,DAY1,DAY2,DAY3,DAY4,DAY5,DAY6,DAY7,DAY8,DAY9,DAY10,DAY11,DAY12,DAY13,DAY14,DAY15,DAY16,DAY17,DAY18,DAY19,DAY20,DAY21,DAY22,DAY23,DAY24,DAY25,DAY26,DAY27,DAY28,DAY29,DAY30,DAY31,Repdate) VALUES ('OutPut'," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + "," + FabIndex.OutPut + ",sysdate)";
+                    ctx.Database.ExecuteSqlRaw(sql);
+                }
+                if (FabIndex.PhotoOut != 1)
+                {
+                    string DeleteSql = "Delete From RANDY_EPM_TAR  WHERE PTYPE ='PhotoOut'";
+                    ctx.Database.ExecuteSqlRaw(DeleteSql);
+                    string sql = "insert into RANDY_EPM_TAR (PTYPE,MP,DAY1,DAY2,DAY3,DAY4,DAY5,DAY6,DAY7,DAY8,DAY9,DAY10,DAY11,DAY12,DAY13,DAY14,DAY15,DAY16,DAY17,DAY18,DAY19,DAY20,DAY21,DAY22,DAY23,DAY24,DAY25,DAY26,DAY27,DAY28,DAY29,DAY30,DAY31,Repdate) VALUES ('PhotoOut'," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + "," + FabIndex.PhotoOut + ",sysdate)";
+                    ctx.Database.ExecuteSqlRaw(sql);
+                }
+
+            }
+
+                // 返回成功消息
+                return "success";
+        }
+    }
+}

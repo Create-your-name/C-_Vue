@@ -1,0 +1,125 @@
+﻿using webapi.Entity.Rxrep;
+using Microsoft.EntityFrameworkCore;
+
+namespace webapi.Models;
+
+public partial class RxrepContext : DbContext
+{
+    public RxrepContext()
+    {
+    }
+
+    public RxrepContext(DbContextOptions<RxrepContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<RptWaferStart> RptWaferStarts { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseOracle("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.163.76.4)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=RXREPT)));User Id=rxrep;Password=rxrep;");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .HasDefaultSchema("RXREP")
+            .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<RptWaferStart>(entity =>
+        {
+            entity.HasKey(e => e.Appid);
+
+            entity.ToTable("RPT_WAFER_START");
+
+            entity.HasIndex(e => e.Wono, "I_RPT_WAFER_START_WONO");
+
+            entity.Property(e => e.Appid)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("APPID");
+            entity.Property(e => e.Abctype)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("ABCTYPE");
+            entity.Property(e => e.DailyPday)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("DAILY_PDAY");
+            entity.Property(e => e.Layerno)
+                .HasColumnType("NUMBER")
+                .HasColumnName("LAYERNO");
+            entity.Property(e => e.Lotcomment)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("LOTCOMMENT");
+            entity.Property(e => e.Lotcreatedate)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LOTCREATEDATE");
+            entity.Property(e => e.Lotstartdate)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LOTSTARTDATE");
+            entity.Property(e => e.Lottype)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LOTTYPE");
+            entity.Property(e => e.Planname)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("PLANNAME");
+            entity.Property(e => e.Planversion)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("PLANVERSION");
+            entity.Property(e => e.Processtype)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSTYPE");
+            entity.Property(e => e.Productname)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCTNAME");
+            entity.Property(e => e.Productversion)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCTVERSION");
+            entity.Property(e => e.Startqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("STARTQTY");
+            entity.Property(e => e.Wono)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("WONO");
+        });
+        modelBuilder.HasSequence("ACTIONSTUDYNO");
+        modelBuilder.HasSequence("CPT_SEQ");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_SHIPTONO");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_TONO");
+        modelBuilder.HasSequence("DEPT_ONDUTYNO");
+        modelBuilder.HasSequence("DEV_MESSAGE_NO");
+        modelBuilder.HasSequence("DEVELOP_EQUIP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_EQUIPJOBNO");
+        modelBuilder.HasSequence("DEVELOP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_SYS_NO");
+        modelBuilder.HasSequence("HEF_PRODUCT_INFO_ID");
+        modelBuilder.HasSequence("HFE_LOT_INFO_ID");
+        modelBuilder.HasSequence("IFAB_PURVIEWNO");
+        modelBuilder.HasSequence("IFAB_UPLOADNO");
+        modelBuilder.HasSequence("IFAB_USERNO");
+        modelBuilder.HasSequence("IT_WORKPLANNO");
+        modelBuilder.HasSequence("MODULE_STEPCODENO");
+        modelBuilder.HasSequence("OEE_CAPAGROUP_SNO");
+        modelBuilder.HasSequence("PMS_USER_NO");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_ID");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_MA_ID");
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}

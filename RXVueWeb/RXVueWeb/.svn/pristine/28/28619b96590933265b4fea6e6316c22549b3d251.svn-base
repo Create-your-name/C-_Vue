@@ -1,0 +1,1034 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using webapi.Entity;
+
+namespace webapi.Models;
+
+public partial class ModelContext : DbContext
+{
+    public ModelContext()
+    {
+    }
+
+    public ModelContext(DbContextOptions<ModelContext> options)
+        : base(options) //选项模式 动态化
+    {
+    }
+
+    //  CodeFirst 模式 add-migration   init-Mig(迁移名称) ;     update-database （执行到数据库）
+    public virtual DbSet<BpmiTask> BpmiTasks { get; set; }
+
+    public virtual DbSet<BpmiToken> BpmiTokens { get; set; }
+
+    public virtual DbSet<BpmiTokenlast> BpmiTokenlasts { get; set; }
+
+    public virtual DbSet<RxFormProductUnusual> RxFormProductUnusuals { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseOracle("Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.163.80.13)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ORCL)));User Id=rxmesuser;Password=rxmesuser;");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder
+            .HasDefaultSchema("RXMESUSER")
+            .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<BpmiTask>(entity =>
+        {
+            entity.HasKey(e => e.Taskid).HasName("BPMI_TASK2PK");
+
+            entity.ToTable("BPMI_TASK", "RXBPM");
+
+            entity.HasIndex(e => e.Processid, "BPMI_TASKP1ID");
+
+            entity.Property(e => e.Taskid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TASKID");
+            entity.Property(e => e.Begintime)
+                .HasDefaultValueSql("SYSDATE ")
+                .HasColumnType("DATE")
+                .HasColumnName("BEGINTIME");
+            entity.Property(e => e.Column1)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN1");
+            entity.Property(e => e.Column2)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN2");
+            entity.Property(e => e.Column3)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN3");
+            entity.Property(e => e.Column4)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN4");
+            entity.Property(e => e.Column5)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN5");
+            entity.Property(e => e.Column6)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN6");
+            entity.Property(e => e.Finishtime)
+                .HasDefaultValueSql("SYSDATE ")
+                .HasColumnType("DATE")
+                .HasColumnName("FINISHTIME");
+            entity.Property(e => e.Inituserdept)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERDEPT");
+            entity.Property(e => e.Inituserid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERID");
+            entity.Property(e => e.Initusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERNAME");
+            entity.Property(e => e.Isenable)
+                .IsRequired()
+                .HasPrecision(1)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("ISENABLE");
+            entity.Property(e => e.Modulecode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("MODULECODE");
+            entity.Property(e => e.Parentserver)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("PARENTSERVER");
+            entity.Property(e => e.Parentsystemid)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("PARENTSYSTEMID");
+            entity.Property(e => e.Parenttokenid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PARENTTOKENID");
+            entity.Property(e => e.Processcode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSCODE");
+            entity.Property(e => e.Processid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PROCESSID");
+            entity.Property(e => e.Processname)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSNAME");
+            entity.Property(e => e.Roottokenid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ROOTTOKENID");
+            entity.Property(e => e.Simulate)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("SIMULATE");
+            entity.Property(e => e.Taskname)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("TASKNAME");
+            entity.Property(e => e.Taskpriority)
+                .HasPrecision(10)
+                .HasColumnName("TASKPRIORITY");
+            entity.Property(e => e.Taskresult)
+                .HasPrecision(10)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("TASKRESULT");
+            entity.Property(e => e.Taskstatus)
+                .HasPrecision(10)
+                .HasColumnName("TASKSTATUS");
+        });
+
+        modelBuilder.Entity<BpmiToken>(entity =>
+        {
+            entity.HasKey(e => e.Tokenid).HasName("BPMI_TOKENPK1");
+
+            entity.ToTable("BPMI_TOKEN", "RXBPM");
+
+            entity.HasIndex(e => e.Actorid, "BPMI_TOKENACTOR2ID");
+
+            entity.HasIndex(e => e.Taskid, "BPMI_TOKENTASK11ID");
+
+            entity.HasIndex(e => e.Transitionid, "BPMI_TOKENTR11ID");
+
+            entity.HasIndex(e => new { e.Formid, e.Result, e.Tokenname }, "BPMI_TOKEN_INDEX01");
+
+            entity.Property(e => e.Tokenid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TOKENID");
+            entity.Property(e => e.Activityid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ACTIVITYID");
+            entity.Property(e => e.Actorid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ACTORID");
+            entity.Property(e => e.Curdeptname)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("CURDEPTNAME");
+            entity.Property(e => e.Curusername)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("CURUSERNAME");
+            entity.Property(e => e.Elementtype)
+                .HasPrecision(10)
+                .HasColumnName("ELEMENTTYPE");
+            entity.Property(e => e.Expiretime)
+                .HasColumnType("DATE")
+                .HasColumnName("EXPIRETIME");
+            entity.Property(e => e.Finishtime)
+                .HasColumnType("DATE")
+                .HasColumnName("FINISHTIME");
+            entity.Property(e => e.Formid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("FORMID");
+            entity.Property(e => e.Fromaccount)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMACCOUNT");
+            entity.Property(e => e.Fromusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMUSERNAME");
+            entity.Property(e => e.Isrecede)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("ISRECEDE");
+            entity.Property(e => e.Lastnotifytime)
+                .HasColumnType("DATE")
+                .HasColumnName("LASTNOTIFYTIME");
+            entity.Property(e => e.Notifyfrequence)
+                .HasColumnType("FLOAT")
+                .HasColumnName("NOTIFYFREQUENCE");
+            entity.Property(e => e.Processcode)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSCODE");
+            entity.Property(e => e.Progressstatus)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("PROGRESSSTATUS");
+            entity.Property(e => e.Receivetime)
+                .HasDefaultValueSql("sysdate")
+                .HasColumnType("DATE")
+                .HasColumnName("RECEIVETIME");
+            entity.Property(e => e.Recyclelevel)
+                .HasPrecision(10)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("RECYCLELEVEL");
+            entity.Property(e => e.Remark)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("REMARK");
+            entity.Property(e => e.Result)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("RESULT");
+            entity.Property(e => e.Showinlist)
+                .HasPrecision(2)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("SHOWINLIST");
+            entity.Property(e => e.Standardtime)
+                .HasDefaultValueSql("0")
+                .HasColumnType("NUMBER(10,2)")
+                .HasColumnName("STANDARDTIME");
+            entity.Property(e => e.Systemid)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValueSql("'DEFAULT' ")
+                .HasColumnName("SYSTEMID");
+            entity.Property(e => e.Taskid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TASKID");
+            entity.Property(e => e.Tokenname)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("TOKENNAME");
+            entity.Property(e => e.Tokenstatus)
+                .HasPrecision(10)
+                .HasColumnName("TOKENSTATUS");
+            entity.Property(e => e.Transitionid)
+                .HasMaxLength(800)
+                .IsUnicode(false)
+                .HasColumnName("TRANSITIONID");
+        });
+
+        modelBuilder.Entity<BpmiTokenlast>(entity =>
+        {
+            entity.HasKey(e => e.Tokenid).HasName("BPMI_TLPK");
+
+            entity.ToTable("BPMI_TOKENLAST", "RXBPM");
+
+            entity.HasIndex(e => new { e.Actorid, e.Taskid }, "BPMI_TOKENLASTTASKID11ID");
+
+            entity.HasIndex(e => e.Receivetime, "PKSDS");
+
+            entity.HasIndex(e => e.Inituserid, "PPINITID");
+
+            entity.Property(e => e.Tokenid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TOKENID");
+            entity.Property(e => e.Activityid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ACTIVITYID");
+            entity.Property(e => e.Actorid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ACTORID");
+            entity.Property(e => e.Begintime)
+                .HasDefaultValueSql("sysdate ")
+                .HasColumnType("DATE")
+                .HasColumnName("BEGINTIME");
+            entity.Property(e => e.Column1)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN1");
+            entity.Property(e => e.Column2)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN2");
+            entity.Property(e => e.Column3)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN3");
+            entity.Property(e => e.Column4)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN4");
+            entity.Property(e => e.Column5)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN5");
+            entity.Property(e => e.Column6)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("COLUMN6");
+            entity.Property(e => e.Curdeptname)
+                .HasMaxLength(150)
+                .IsUnicode(false)
+                .HasColumnName("CURDEPTNAME");
+            entity.Property(e => e.Curusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CURUSERNAME");
+            entity.Property(e => e.Elementtype)
+                .HasPrecision(10)
+                .HasColumnName("ELEMENTTYPE");
+            entity.Property(e => e.Expiretime)
+                .HasColumnType("DATE")
+                .HasColumnName("EXPIRETIME");
+            entity.Property(e => e.Finishtime)
+                .HasColumnType("DATE")
+                .HasColumnName("FINISHTIME");
+            entity.Property(e => e.Formid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("FORMID");
+            entity.Property(e => e.Fromaccount)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMACCOUNT");
+            entity.Property(e => e.Fromusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("FROMUSERNAME");
+            entity.Property(e => e.Inituserdept)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERDEPT");
+            entity.Property(e => e.Inituserid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERID");
+            entity.Property(e => e.Initusername)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("INITUSERNAME");
+            entity.Property(e => e.Isenable)
+                .IsRequired()
+                .HasPrecision(1)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("ISENABLE");
+            entity.Property(e => e.Isrecede)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0")
+                .HasColumnName("ISRECEDE");
+            entity.Property(e => e.Lastnotifytime)
+                .HasColumnType("DATE")
+                .HasColumnName("LASTNOTIFYTIME");
+            entity.Property(e => e.Modulecode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("MODULECODE");
+            entity.Property(e => e.Notifyfrequence)
+                .HasColumnType("FLOAT")
+                .HasColumnName("NOTIFYFREQUENCE");
+            entity.Property(e => e.Processcode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSCODE");
+            entity.Property(e => e.Processid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PROCESSID");
+            entity.Property(e => e.Processname)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSNAME");
+            entity.Property(e => e.Progressstatus)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("PROGRESSSTATUS");
+            entity.Property(e => e.Receivetime)
+                .HasDefaultValueSql("sysdate ")
+                .HasColumnType("DATE")
+                .HasColumnName("RECEIVETIME");
+            entity.Property(e => e.Remark)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("REMARK");
+            entity.Property(e => e.Result)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("RESULT");
+            entity.Property(e => e.Showinlist)
+                .HasPrecision(2)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("SHOWINLIST");
+            entity.Property(e => e.Simulate)
+                .HasPrecision(2)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("SIMULATE");
+            entity.Property(e => e.Standardtime)
+                .HasDefaultValueSql("0 ")
+                .HasColumnType("NUMBER(10,2)")
+                .HasColumnName("STANDARDTIME");
+            entity.Property(e => e.Systemid)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValueSql("'DEFAULT' ")
+                .HasColumnName("SYSTEMID");
+            entity.Property(e => e.Taskid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TASKID");
+            entity.Property(e => e.Taskname)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("TASKNAME");
+            entity.Property(e => e.Taskpriority)
+                .HasPrecision(10)
+                .HasDefaultValueSql("1 ")
+                .HasColumnName("TASKPRIORITY");
+            entity.Property(e => e.Taskresult)
+                .HasPrecision(10)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("TASKRESULT");
+            entity.Property(e => e.Taskstatus)
+                .HasPrecision(10)
+                .HasDefaultValueSql("0 ")
+                .HasColumnName("TASKSTATUS");
+            entity.Property(e => e.Tokenname)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("TOKENNAME");
+            entity.Property(e => e.Tokenstatus)
+                .HasPrecision(10)
+                .HasColumnName("TOKENSTATUS");
+            entity.Property(e => e.Transitionid)
+                .HasMaxLength(800)
+                .IsUnicode(false)
+                .HasColumnName("TRANSITIONID");
+        });
+
+        modelBuilder.Entity<RxFormProductUnusual>(entity =>
+        {
+            entity.HasKey(e => e.Taskid).HasName("RX_FORM_PRODUCT_UNUSUALPK");
+
+            entity.ToTable("RX_FORM_PRODUCT_UNUSUAL", "RXBPM");
+
+            entity.Property(e => e.Taskid)
+                .HasMaxLength(32)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("TASKID");
+            entity.Property(e => e.Allselect)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ALLSELECT");
+            entity.Property(e => e.ApplyDate)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("APPLY_DATE");
+            entity.Property(e => e.ApplyName)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("APPLY_NAME");
+            entity.Property(e => e.Cbyyfx)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CBYYFX");
+            entity.Property(e => e.Clbm)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CLBM");
+            entity.Property(e => e.Cpbm)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CPBM");
+            entity.Property(e => e.Cplx)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CPLX");
+            entity.Property(e => e.CponwerName)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPONWER_NAME");
+            entity.Property(e => e.CpowmerQzyx)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWMER_QZYX");
+            entity.Property(e => e.Cpowner)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER");
+            entity.Property(e => e.CpownerQryj)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_QRYJ");
+            entity.Property(e => e.CpownerRq)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_RQ");
+            entity.Property(e => e.CpownerSfkmrb)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_SFKMRB");
+            entity.Property(e => e.CpownerSfxyzrbmyyfx)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_SFXYZRBMYYFX");
+            entity.Property(e => e.CpownerYcdj)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_YCDJ");
+            entity.Property(e => e.CpownerYysl)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPOWNER_YYSL");
+            entity.Property(e => e.Cppz)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("CPPZ");
+            entity.Property(e => e.Equipid)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("EQUIPID");
+            entity.Property(e => e.FileUploadYccl)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("FILE_UPLOAD_YCCL");
+            entity.Property(e => e.Gf)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("GF");
+            entity.Property(e => e.Gfz)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("GFZ");
+            entity.Property(e => e.Gy)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("GY");
+            entity.Property(e => e.HidCplx)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("HID_CPLX");
+            entity.Property(e => e.Kyps)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("KYPS");
+            entity.Property(e => e.Location)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("LOCATION");
+            entity.Property(e => e.Lottype)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("LOTTYPE");
+            entity.Property(e => e.Lps)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("LPS");
+            entity.Property(e => e.No)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("NO");
+            entity.Property(e => e.No1)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO1");
+            entity.Property(e => e.No10)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO10");
+            entity.Property(e => e.No11)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO11");
+            entity.Property(e => e.No12)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO12");
+            entity.Property(e => e.No13)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO13");
+            entity.Property(e => e.No14)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO14");
+            entity.Property(e => e.No15)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO15");
+            entity.Property(e => e.No16)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO16");
+            entity.Property(e => e.No17)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO17");
+            entity.Property(e => e.No18)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO18");
+            entity.Property(e => e.No19)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO19");
+            entity.Property(e => e.No2)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO2");
+            entity.Property(e => e.No20)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO20");
+            entity.Property(e => e.No21)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO21");
+            entity.Property(e => e.No22)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO22");
+            entity.Property(e => e.No23)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO23");
+            entity.Property(e => e.No24)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO24");
+            entity.Property(e => e.No25)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO25");
+            entity.Property(e => e.No3)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO3");
+            entity.Property(e => e.No4)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO4");
+            entity.Property(e => e.No5)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO5");
+            entity.Property(e => e.No6)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO6");
+            entity.Property(e => e.No7)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO7");
+            entity.Property(e => e.No8)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO8");
+            entity.Property(e => e.No9)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("NO9");
+            entity.Property(e => e.Pcm)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PCM");
+            entity.Property(e => e.Ph)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("PH");
+            entity.Property(e => e.PhTp)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("PH_TP");
+            entity.Property(e => e.Recipeid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("RECIPEID");
+            entity.Property(e => e.Scz)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("SCZ");
+            entity.Property(e => e.Sftzowner)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("SFTZOWNER");
+            entity.Property(e => e.Stage)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("STAGE");
+            entity.Property(e => e.Stepcode)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("STEPCODE");
+            entity.Property(e => e.Stepdescription)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("STEPDESCRIPTION");
+            entity.Property(e => e.Stepname)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("STEPNAME");
+            entity.Property(e => e.Tzgcs)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("TZGCS");
+            entity.Property(e => e.TzgcsAccount)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("TZGCS_ACCOUNT");
+            entity.Property(e => e.Uploadfile)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("UPLOADFILE");
+            entity.Property(e => e.Xxms)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("XXMS");
+            entity.Property(e => e.YcclBm)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCL_BM");
+            entity.Property(e => e.YcclFl)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCL_FL");
+            entity.Property(e => e.YcclLscs)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCL_LSCS");
+            entity.Property(e => e.YcclOos)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCCL_OOS");
+            entity.Property(e => e.YcclXz)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCL_XZ");
+            entity.Property(e => e.Ycclcc)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCLCC");
+            entity.Property(e => e.Ycclgcs)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCLGCS");
+            entity.Property(e => e.YcclgcsClrq)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCCLGCS_CLRQ");
+            entity.Property(e => e.Ycid)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCID");
+            entity.Property(e => e.Ycms)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("YCMS");
+            entity.Property(e => e.YcqrQrzg)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCQR_QRZG");
+            entity.Property(e => e.YcqrQrzgQrrq)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCQR_QRZG_QRRQ");
+            entity.Property(e => e.YcqrRemark)
+                .HasMaxLength(2000)
+                .IsUnicode(false)
+                .HasColumnName("YCQR_REMARK");
+            entity.Property(e => e.Ycxxqr)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCXXQR");
+            entity.Property(e => e.Ycyygl)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCYYGL");
+            entity.Property(e => e.Yczcl1)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL1");
+            entity.Property(e => e.Yczcl10)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL10");
+            entity.Property(e => e.Yczcl11)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL11");
+            entity.Property(e => e.Yczcl12)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL12");
+            entity.Property(e => e.Yczcl13)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL13");
+            entity.Property(e => e.Yczcl14)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL14");
+            entity.Property(e => e.Yczcl15)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL15");
+            entity.Property(e => e.Yczcl16)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL16");
+            entity.Property(e => e.Yczcl17)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL17");
+            entity.Property(e => e.Yczcl18)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL18");
+            entity.Property(e => e.Yczcl19)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL19");
+            entity.Property(e => e.Yczcl2)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL2");
+            entity.Property(e => e.Yczcl20)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL20");
+            entity.Property(e => e.Yczcl21)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL21");
+            entity.Property(e => e.Yczcl22)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL22");
+            entity.Property(e => e.Yczcl23)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL23");
+            entity.Property(e => e.Yczcl24)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL24");
+            entity.Property(e => e.Yczcl25)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL25");
+            entity.Property(e => e.Yczcl3)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL3");
+            entity.Property(e => e.Yczcl4)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL4");
+            entity.Property(e => e.Yczcl5)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL5");
+            entity.Property(e => e.Yczcl6)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL6");
+            entity.Property(e => e.Yczcl7)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL7");
+            entity.Property(e => e.Yczcl8)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL8");
+            entity.Property(e => e.Yczcl9)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YCZCL9");
+            entity.Property(e => e.Yield)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YIELD");
+            entity.Property(e => e.Yocap)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YOCAP");
+            entity.Property(e => e.Ypcl1)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL1");
+            entity.Property(e => e.Ypcl10)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL10");
+            entity.Property(e => e.Ypcl11)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL11");
+            entity.Property(e => e.Ypcl12)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL12");
+            entity.Property(e => e.Ypcl13)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL13");
+            entity.Property(e => e.Ypcl14)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL14");
+            entity.Property(e => e.Ypcl15)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL15");
+            entity.Property(e => e.Ypcl16)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL16");
+            entity.Property(e => e.Ypcl17)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL17");
+            entity.Property(e => e.Ypcl18)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL18");
+            entity.Property(e => e.Ypcl19)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL19");
+            entity.Property(e => e.Ypcl2)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL2");
+            entity.Property(e => e.Ypcl20)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL20");
+            entity.Property(e => e.Ypcl21)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL21");
+            entity.Property(e => e.Ypcl22)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL22");
+            entity.Property(e => e.Ypcl23)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL23");
+            entity.Property(e => e.Ypcl24)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL24");
+            entity.Property(e => e.Ypcl25)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL25");
+            entity.Property(e => e.Ypcl3)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL3");
+            entity.Property(e => e.Ypcl4)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL4");
+            entity.Property(e => e.Ypcl5)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL5");
+            entity.Property(e => e.Ypcl6)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL6");
+            entity.Property(e => e.Ypcl7)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL7");
+            entity.Property(e => e.Ypcl8)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL8");
+            entity.Property(e => e.Ypcl9)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("YPCL9");
+            entity.Property(e => e.YpclYcsl)
+                .HasMaxLength(550)
+                .IsUnicode(false)
+                .HasColumnName("YPCL_YCSL");
+            entity.Property(e => e.Zxyc)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("ZXYC");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}

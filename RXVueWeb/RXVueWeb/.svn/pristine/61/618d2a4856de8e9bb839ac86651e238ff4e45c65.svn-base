@@ -1,0 +1,193 @@
+﻿ <template>
+     <el-form :model="form" label-width="110px" :rules="rules">
+         <!-- FabIndex 相关数据 DB Insert-->
+         <el-tag class="ml-2" size="50px" type="danger">FabIndex</el-tag>
+         <el-tabs type="card" class="demo-tabs">
+             <el-row class="row-bg" justify="space-evenly">
+                 <el-col :span="6">
+                     <el-form-item prop="FabIndexDate.DailyMOVE">
+                         <span class="custom-label">FabIndex.DailyMOVE</span>
+                         <el-input-number v-model="FabIndexDate.DailyMOVE" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="6">
+                     <el-form-item prop="FabIndexDate.PhotoOut">
+                         <span class="custom-label">FabIndex.PhotoOut</span>
+                         <el-input-number v-model="FabIndexDate.PhotoOut" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="6">
+                     <el-form-item prop="FabIndexDate.OutPut">
+                         <span class="custom-label">FabIndex.OutPut</span>
+                         <el-input-number v-model="FabIndexDate.OutPut" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="6">
+                     <el-form-item prop="FabIndexDate.WaferStart">
+                         <span class="custom-label">FabIndex.WaferStart</span>
+                         <el-input-number v-model="FabIndexDate.WaferStart" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+             </el-row>
+             <el-button type="primary" @click="FabIndex()"> FabIndex数据提交</el-button>
+         </el-tabs>
+         <!-- 每日推送 相关数据 DB Insert-->
+         <el-tabs type="card" class="demo-tabs">
+
+             <!--  -->
+             <el-tag class="ml-2" size="50px" type="danger">邮件推送 数据维护</el-tag>
+             <el-row class="row-bg" justify="space-evenly">
+                 <el-form-item class="Producess" prop="EmailWaferOut.GYDL">
+                     <span class="Producess">工艺大类</span>
+                     <el-select v-model="EmailWaferOut.GYDL" clearable class="filter-item" placeholder="输入您对应的工艺大类">
+                         <el-option v-for="option in options" :key="option.value" :label="option.label" :value="option.value"></el-option>
+                     </el-select>
+                 </el-form-item>
+                 <el-col :span="2">
+                     <el-form-item prop="EmailWaferOut.BP投料目标PCS">
+                         <span class="Producess">BP投料目标PCS</span>
+                         <el-input-number v-model="EmailWaferOut.BP投料目标PCS" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.BP投料目标KLayer">
+                         <span class="Producess">BP投料目标KLayer</span>
+                         <el-input-number v-model="EmailWaferOut.BP投料目标KLayer" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.BP投料计划WSAccPlan">
+                         <span class="Producess">BP投料计划WSAccPlan</span>
+                         <el-input-number v-model="EmailWaferOut.BP投料计划WSAccPlan" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.BP投料计划WSAccPlan_K_L">
+                         <span class="Producess">BP投料计划WSAccPlan_K/L</span>
+                         <el-input-number v-model="EmailWaferOut.BP投料计划WSAccPlan_K_L" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+             </el-row>
+             <el-row class="row-bg" justify="space-evenly">
+                 <el-col :span="2">
+                     <el-form-item prop="EmailWaferOut.MF1_6投料目标MFPCS">
+                         <span class="Producess">MF1+6投料目标MF_PCS</span>
+                         <el-input-number v-model="EmailWaferOut.MF1_6投料目标MFPCS" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.MF1_6投料目标MF_KLayer">
+                         <span class="Producess">MF1+6投料目标MF_KLayer</span>
+                         <el-input-number v-model="EmailWaferOut.MF1_6投料目标MF_KLayer" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.MF1_6投料计划WS_Acc_Plan">
+                         <span class="Producess">MF1+6投料计划WS_Acc_Plan</span>
+                         <el-input-number v-model="EmailWaferOut.MF1_6投料计划WS_Acc_Plan" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+                 <el-col :span="3">
+                     <el-form-item prop="EmailWaferOut.MF1_6投料计划WS_Acc_Plan_K_L">
+                         <span class="Producess">MF1+6投料计划WS_Acc_Plan_K/L</span>
+                         <el-input-number v-model="EmailWaferOut.MF1_6投料计划WS_Acc_Plan_K_L" :min="1" :max="10000000" />
+                     </el-form-item>
+                 </el-col>
+             </el-row>
+
+
+
+             <el-button type="primary" @click="EmailInsertDB()"> 推送邮件WaferOut数据提交</el-button>
+         </el-tabs>
+     </el-form>
+</template>
+
+<script>
+    
+    import axios from "axios";     
+
+    export default {
+        data() {
+            return {
+                UserInput:"",
+                    FabIndexDate: {
+                        DailyMOVE: 0,
+                        PhotoOut: 0,
+                        OutPut: 0,
+                        WaferStart: 0,
+                    },
+                    EmailWaferOut: {
+                        GYDL:"",
+                        BP投料目标PCS: 1,
+                        BP投料目标KLayer: 1,
+                        BP投料计划WSAccPlan: 1,
+                        BP投料计划WSAccPlan_K_L: 1,
+                        MF1_6投料目标MFPCS: 1,
+                        MF1_6投料目标MF_KLayer: 1,
+                        MF1_6投料计划WS_Acc_Plan: 1,
+                        MF1_6投料计划WS_Acc_Plan_K_L: 1
+
+                    },
+            options: [ // 下拉框的选项数据
+                { label: 'F-BAR', value: 'F-BAR' },
+                { label: 'PLC', value: 'PLC' },
+                { label: 'SMR', value: 'SMR' },
+                { label: '生物电极', value: '生物电极' },
+                { label: 'SAW', value: 'SAW' },
+                { label: '咪头', value: '咪头' },
+                { label: 'PCR', value: 'PCR' },
+                // ...
+            ]
+                };
+            },
+    methods: {
+        FabIndex() {
+                const confirmInput = prompt('请输入密码');
+                if (confirmInput === 'sxx') {
+                        axios.post("http://10.163.76.23/api/api/PcMonth/FabIndex", this.FabIndexDate)
+                    //  axios.post("https://localhost:7155/api/PcMonth/FabIndex", this.FabIndexDate)
+                        .then((res) => {
+                            this.formData = res.data;
+                            this.total = res.data.length;
+                        })
+                } else {
+                    alert('输入错误，请重新操作');
+                }
+            },
+            EmailInsertDB() {
+                    const confirmInput = prompt('请输入密码');
+                    if (confirmInput === 'sxx') {
+                        axios.post("http://10.163.76.23/api/api/PcMonth/WaferStart", this.EmailWaferOut)
+                    //      axios.post("https://localhost:7155/api/PcMonth/WaferStart", this.EmailWaferOut)
+                                .then((res) => {
+                                    this.formData = res.data;
+                                    this.total = res.data.length;
+                                })
+                    } else {
+                        alert('输入错误，请重新操作');
+                    }
+                 },
+            },
+        
+    
+        mounted() {
+	        document.title = "月数据录取"
+        },
+    };
+</script>
+
+ <style>
+     .custom-label {
+         font-size: 20px;
+         margin-left: 20px;
+     }
+
+        .Producess{
+            font-size: 30px;
+        }
+
+    .ml-2{
+        font-size: 35px;
+        margin-left: 10px;
+    }
+ </style>

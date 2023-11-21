@@ -1,0 +1,794 @@
+﻿
+using OfficeOpenXml.Style;
+using webapi.Models;
+using System.Drawing;
+using OfficeOpenXml;
+using System.Security.Cryptography.X509Certificates;
+using Aspose.Email.Clients.Exchange.WebService.Schema_2016;
+using Microsoft.Office.Interop.Excel;
+using System.Globalization;
+using NPOI.SS.Formula.Functions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Office.Interop.Outlook;
+using Aspose.Email.Calendar.Recurrences;
+
+namespace webapi.Service.SaveExcel
+{
+    public class ExcelServer
+    {
+        static public string SendExcel(string ExcelPath, string Sheet,List<String> RowList,DateTime FistTime,DateTime LastTime)
+        {
+            String EmailBody = "";
+
+
+            DateTime nowDate = FistTime.AddDays(-1);
+            ExcelWorksheet worksheet;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            using (ExcelPackage p = new ExcelPackage())
+            {
+                string path = ExcelPath;
+
+                worksheet = p.Workbook.Worksheets.Add(Sheet);
+
+                // 算法需要重构咯
+                for (int i = 1; nowDate != LastTime; nowDate = nowDate.AddDays(-1), i++)
+                {
+                    // DAY      ->  
+                    // 这里也要进行一个 解耦
+                    var YearMounth = nowDate.ToString("yyyy/MM/dd").Replace("/", "").Substring(0, 6);
+                    var Day = nowDate.ToString("yyyy/MM/dd").Replace("/", "").Substring(6, 2);
+                    //   封装 Row
+                    foreach (var RowName in RowList) {
+                        var Row = 1;
+                        worksheet.Cells[1, Row].Value = RowName;
+                    }
+                    var l = 1;
+                    for (; l < 12 && i == 1; l++)
+                    {
+                        worksheet.Cells[1, l].Style.Font.Size = 12;
+                        //worksheet.Cells[1, 1].Style.Font.Color.SetColor(Color.Blue);
+                        worksheet.Column(l).Width = 10;
+                        worksheet.Cells[1, l].Style.Fill.PatternType = ExcelFillStyle.Solid; // 设置填充模式为纯色
+
+                        // 设置背景颜色为透明的特定RGB值
+                        Color backgroundColor = Color.FromArgb(128, 83, 141, 213); // 设置透明度为128
+                        worksheet.Cells[1, l].Style.Fill.BackgroundColor.SetColor(backgroundColor);
+                    }
+
+
+                    // 封装 
+
+                    if (ExcelPath == @"C:\TEST\DynCT_NEW.xlsx")
+                    {
+                        EmailBody += DatCTEmailDbInsertExcell(RowList, ref worksheet, YearMounth, Day, i + 1, nowDate);
+                    }
+                    else if (ExcelPath == @"C:\TEST\月结模版.xlsx")
+                    {
+                        EmailBody += CMP_JH_SptsEmailDbInsertExcel(ref worksheet, i + 1);
+                    }
+                    else {
+                        Console.WriteLine("Wafer Start");
+                        EmailBody += WaferStartEmailDbInserExcel(ref worksheet, i + 1);
+                    }
+
+                }
+                p.SaveAs(new FileInfo(path));
+            }
+
+            return EmailBody;
+        }
+
+        static public string DatCTEmailDbInsertExcell(List<String> RowList , ref ExcelWorksheet workbook,String ref1,String ref2,int ForRef,DateTime nowDate) 
+        
+        {
+            workbook.Cells[1, 1].Value = "DAY";
+            workbook.Cells[1, 2].Value = "WS";
+            workbook.Cells[1, 3].Value = "WO";
+            workbook.Cells[1, 4].Value = "WIP";
+            workbook.Cells[1, 5].Value = "HoldWIP";
+            workbook.Cells[1, 6].Value = "StepMove";
+            workbook.Cells[1, 7].Value = "TR";
+            workbook.Cells[1, 8].Value = "CT";
+            workbook.Cells[1, 9].Value = "BANK";
+            workbook.Cells[1, 10].Value = "AVG STEP/LAYER";
+            workbook.Cells[1, 11].Value = "Scrap";
+            string EmailBody = "";
+
+            using (RxrepContext ctx = new RxrepContext())
+            {
+                var ToDay = ctx.WtDynamicctreports.Where(e => e.Period == ref1)
+                    .Where(e => e.Pdate == int.Parse(ref2)).ToList();
+                //  WS      ->
+                var  nowDay = ref1 + ref2;
+                var WaferStart = ctx.RptWaferStarts.Where( e =>e.Lotstartdate.Substring(0,8)==nowDay).Sum(e=>e.Startqty);
+                var WaferOut = ctx.RptLotFinishes.Where(e => e.Qaouttime.Substring(0, 8) == nowDay).Sum(e => e.Qaoutqty);
+                using (Rxrept2Context ctx2 = new Rxrept2Context())
+                {
+                    var HNumber = ctx2.RepActlHs.FromSqlInterpolated($@"select * from rep_actl_h where STAGE='QA' AND STATE='HOLD' AND HOLDCODE='HRMM11'").ToList();
+                    WaferOut += HNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Stateentrytime.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")).ToString("yyyy/MM/dd") == DateTime.ParseExact(nowDay, "yyyyMMdd", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd")).Sum(e => e.Curmainqty);
+                }
+                EmailBody += "<tr  bgcolor=white><td align=center width=8%><font size=2 face=Arial  color=black>" + nowDate.ToString("yyyy/MM/dd") + "</font></td>";
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + WaferStart.ToString() + "</font></td>";
+                // WO       ->      RPT_LOT_FINISH    +　　rep_actl_h　　　HOLD  +　　９　　　ＱＡ　　 HRMM11
+                if (nowDay=="20231002") {
+                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + 0 + "</font></td>";
+                }
+                else {
+                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + WaferOut.ToString() + "</font></td>";
+                }
+                // WIP
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Totwip + "</font></td>";
+                // Hold Wip
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Holdwip + "</font></td>";
+                // Step Move
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Amove + "</font></td>";
+                // TR
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Tottr + "</font></td>";
+                // CT
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Totct + "</font></td>";
+                // BANK
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Bankwip + "</font></td>";
+                // AVG  STEP/LAYER
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ToDay[0].Steplayer + "</font></td>";
+                //Scrap
+                var ScrapNum = ctx.CostScrap0s.ToList();
+                var ScrapList = ScrapNum.Where(e => DateTime.Parse(DateTime.ParseExact(e.Scrapdate.ToString(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")).ToString("yyyy/MM/dd") == DateTime.ParseExact(nowDay, "yyyyMMdd", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd"))
+                    .Sum(e => e.Scrapqty);
+                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>" + ScrapList + "</font></td>";
+
+                workbook.Cells[ForRef, 1].Value = nowDate.ToString("yyyy/M/d");
+                workbook.Cells[ForRef, 2].Value = WaferStart.ToString();
+                if (nowDay == "20231002")
+                {
+                    int abc = 0;
+                    workbook.Cells[ForRef, 3].Value =abc.ToString();
+                }
+                else
+                {
+                    workbook.Cells[ForRef, 3].Value = WaferOut.ToString();
+                }
+                workbook.Cells[ForRef, 4].Value = ToDay[0].Totwip;
+                workbook.Cells[ForRef, 5].Value = ToDay[0].Holdwip;
+                workbook.Cells[ForRef, 6].Value = ToDay[0].Amove;
+                workbook.Cells[ForRef, 7].Value = ToDay[0].Tottr;
+                workbook.Cells[ForRef, 8].Value = ToDay[0].Totct;
+                workbook.Cells[ForRef, 9].Value = ToDay[0].Bankwip;
+                workbook.Cells[ForRef, 10].Value = ToDay[0].Steplayer;
+                workbook.Cells[ForRef, 11].Value = ScrapList.ToString();
+            }
+
+            return EmailBody;
+        }
+
+        static public String CMP_JH_SptsEmailDbInsertExcel(ref ExcelWorksheet workbook, int ForRef) {
+
+            string EmailBody = "<html><title></title><body> ";
+            EmailBody += "<font size=2 face=Arial><b><b> <hr>";
+            using (RxmesContext CMP = new RxmesContext()) { 
+            using (Rxrept2Context ctx = new Rxrept2Context()) {
+                DateTime YesDay = DateTime.Now.AddDays(-1);
+                var eqp = ctx.BCapagroupMoves.Where(e => e.Capagroup == "CMP研磨抛光").ToList();
+                int Yesterday = 0;
+                foreach (var i in eqp) {
+                    Yesterday += ctx.RepHistTots.FromSqlInterpolated(//, tt.outdate  
+                            $@"select distinct t.*, tt.custordernumber
+                                from (select t1.*
+                                      from rep_hist_tot t1 
+                                      where t1.trackouttime >= trunc(to_date({YesDay.AddDays(-1).ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                        and t1.trackouttime < trunc(to_date({YesDay.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                      order by t1.trackouttime) t, rep_actl_h_all tt 
+                                where 1 = 1 
+                                  and t.lotid = tt.lotid(+) 
+                                  and t.lotid not like 'T%' 
+                                  and t.eqpid={i.Equipid}"
+                        ).ToList().Sum(e => e.Curmainqty);
+                    // 如果有参数，将其作为额外的参数传递给 FromSqlInterpolated 方法
+                    // , sqlParameters 
+                }
+
+                DateTime today = DateTime.Now;
+                DateTime firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+                int MonthSum = 0;
+                foreach (var i in eqp)
+                {
+                    MonthSum += ctx.RepHistTots.FromSqlInterpolated(//, tt.outdate  
+                            $@"select distinct t.*, tt.custordernumber
+                                from (select t1.*
+                                      from rep_hist_tot t1 
+                                      where t1.trackouttime >= trunc(to_date({firstDayOfMonth.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                        and t1.trackouttime < trunc(to_date({today.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                      order by t1.trackouttime) t, rep_actl_h_all tt 
+                                where 1 = 1 
+                                  and t.lotid = tt.lotid(+) 
+                                  and t.lotid not like 'T%' 
+                                  and t.eqpid={i.Equipid}"
+                        ).ToList().Sum(e => e.Curmainqty);
+                }
+
+                EmailBody += "<font size=2 face=Arial><b>截至当前CMP MTD 产出目标:" + "4471片" + "实际月累计产出:" + MonthSum.ToString() + " 昨日产出:" + Yesterday.ToString() + " 请关注设备状态和效率<b></font>";
+
+                EmailBody += "<font size=2 face=Arial><b>截至当前,实际返工月累计:" + "返工月累计" + " 昨日返工:" + "昨日返工" + " 片 ，请知悉！<b></font><hr>";
+                EmailBody += "<b><hr>";
+            }
+
+            EmailBody += "<font size=2 face=Arial color=red><b>CMP 昨日状态<b></font> <hr>";
+            EmailBody += "<table border=1 cellspacing=1 cellpadding=1 bgcolor=black width=72%><tr bgcolor=SkyBlue><td align=center width=5%>设备ID</td><td align=center width=5%>RUN</td><td align=center width=5%>IDLE</td><td align=center width=5%>DOWN</td> <td align=center width=5%>TEST</td>  ";
+            EmailBody += "<td align=center width=5%>TESTCW</td><td align=center width=5%>PM</td><td align=center width=5%>WAITMFG</td><td align=center width=5%>MONR</td><td align=center width=5%>WAITENG</td><td align=center width=5%>HOLDENG</td><td align=center width=5%>MONDOWN</td>   ";
+            EmailBody += "<td align=center width=5%>MONPM</td><td align=center width=5%>QCHOLD</td><td align=center width=5%>UNQC</td><td align=center width=5%>FAC</td><td align=center width=5%>SetUp</td><td align=center width=5%>SPCHOLD</td></tr>   ";
+            workbook.Cells[1, 1].Value = "设备ID";
+            workbook.Cells[1, 2].Value = "RUN";
+            workbook.Cells[1, 3].Value = "IDLE";
+            workbook.Cells[1, 4].Value = "DOWN";
+            workbook.Cells[1, 5].Value = "TEST";
+            workbook.Cells[1, 6].Value = "TESTCW";
+            workbook.Cells[1, 7].Value = "PM";
+            workbook.Cells[1, 8].Value = "WAITMFG";
+            workbook.Cells[1, 9].Value = "MONR";
+            workbook.Cells[1, 10].Value = "WAITENG";
+                workbook.Cells[1, 11].Value = "SetUp";
+                workbook.Cells[1, 12].Value = "SPCHOLD";
+                using (RxrepContext ctx =new RxrepContext()) {
+                DateTime YesDay = DateTime.Now.AddDays(-1);
+                using (Rxrept2Context ctx2 = new Rxrept2Context())
+                {
+                    var eqp = ctx2.BCapagroupMoves.Where(e => e.Capagroup == "CMP研磨抛光").ToList();
+                   // var List = YesDay.Date.ToString("yyyy/MM/dd");
+                    foreach (var i in eqp) {
+                        var result = ctx.RepEqpsStartEnds
+                            .FromSqlInterpolated(//, tt.outdate  
+                          /* status,
+                                     SUM((ENDDATE - CHANGEDT) * 24 * 60) AS minutes_diff*/
+
+                           $@"SELECT 
+                                             *
+                                          FROM 
+                                              rep_eqps_start_end 
+                                          WHERE 
+                                              EQPID = {i.Equipid}
+                                              AND TRUNC(CHANGEDT) = TO_DATE({YesDay.Date.ToString("yyyy/MM/dd")}, 'YYYY/MM/DD')
+                                              AND TRUNC(ENDDATE) < TO_DATE({ DateTime.Now.Date.ToString("yyyy/MM/dd")}, 'YYYY/MM/DD')"
+                       ).Select(e=> new { 
+                         Status =e.Status,
+                         TimeSpan = e.Enddate-e.Changedt,
+                       }).ToList();
+
+                        var EqpList = result.GroupBy(e => e.Status)
+                           .Select(e => new
+                           {
+                               Status = e.Key,
+                               TotalTimeSpan = e.Aggregate(TimeSpan.Zero, (total, item) => total + item.TimeSpan)
+                           }).ToList().OrderBy(e=>e.Status);
+
+                        EmailBody += "<tr  bgcolor=white><td align=center width=8%><font size=2 face=Arial  color=black>" + i.Equipid + "</font></td>";
+                        workbook.Cells[ForRef, 1].Value = i.Equipid ;
+                        foreach (var sta in EqpList) {
+                            if (sta.Status == "01_RUN")
+                            {
+                                workbook.Cells[ForRef, 2].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                            if (sta.Status == "02_IDLE")
+                            {
+                                workbook.Cells[ForRef, 3].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                                if (sta.Status == "03_DOWN")
+                                {
+                                    workbook.Cells[ForRef, 4].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "TEST" || sta.Status == "06_TEST")
+                            {
+                                workbook.Cells[ForRef, 5].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                            if (sta.Status == "06_TEST_CW")
+                            {
+                                workbook.Cells[ForRef, 6].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                            if (sta.Status == "04_PM")
+                            {
+                                workbook.Cells[ForRef, 7].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                            if (sta.Status == "04_MON_R")
+                            {
+                                workbook.Cells[ForRef, 8].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                            if (sta.Status == "WAITENG")
+                            {
+                                workbook.Cells[ForRef, 9].Value = sta.TotalTimeSpan;
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += sta.TotalTimeSpan;
+                                EmailBody += "</font></td>";
+                                continue;
+                            }
+                                if (sta.Status == "04_SETUP")
+                                {
+                                    workbook.Cells[ForRef, 10].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "03_SPCHOLD")
+                                {
+                                    workbook.Cells[ForRef, 11].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status != "WAITENG" && sta.Status != "04_MON_R" && sta.Status != "04_PM" && sta.Status != "06_TEST_CW" && sta.Status != "TEST" && sta.Status != "06_TEST" && sta.Status != "03_DOWN" && sta.Status != "02_IDLE" && sta.Status != "01_RUN" && sta.Status != "04_SETUP" && sta.Status != "03_SPCHOLD")
+                            {
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                            }
+
+                        }
+                            var Length = EqpList.Count();
+                            if (0 == EqpList.Count())
+                            {
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>24";
+                                EmailBody += "</font></td>";
+                                Length = 3;
+                            }
+                            for (;Length<17; Length++) {
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                            EmailBody += "</font></td>";
+                        }
+                    }
+
+                        EmailBody += "</tr>   ";
+                        EmailBody += "</table><br><br>";
+                        // 2 
+                        // 第二张表 ！！！！
+                        // second Table
+                        DateTime week = DateTime.Now;
+                        EmailBody += "<table border=1 cellspacing=1 cellpadding=1 bgcolor=black width=72%><tr bgcolor=SkyBlue><td align=center width=5%>EQP</td><td align=center width=5%>产能</td><td align=center width=5%>当前WIP</td><td align=center width=5%>月均产出</td>";
+                        EmailBody += "<td align=center width=5%>周均产出</td><td align=center width=5%>月累计</td>";
+                        for (int i = 1; i <= 7; i++)
+                        {
+                            EmailBody += "  <td align=center width=5%> " + week.AddDays(-i).Date.ToString("yyyy/MM/dd") + " </td>";
+                        }
+                        EmailBody += "</tr><tr  bgcolor=white>";
+                        foreach (var i in eqp) {
+
+                            EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + i.Equipid + "</font></td>";
+                            EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + "155"+ "</font></td>";
+
+                            using (Rxrept2Context rxrep2 = new Rxrept2Context())
+                            {
+                                DateTime NowDay = DateTime.Now;
+                                DateTime firstDayOfMonth = new DateTime(NowDay.Year, NowDay.Month, 1);
+
+                                DateTime MouthDay = DateTime.Now.AddDays(-31);
+
+                                DateTime WeekDay = DateTime.Now.AddDays(-7);
+
+
+                                int diff = (7 + (NowDay.DayOfWeek - DayOfWeek.Monday)) % 7;
+                                DateTime firstDayOfWeek = NowDay.AddDays(-1 * diff).Date;
+
+                                   var  NowTrackIn = rxrep2.RepHistTots.Where(e=> e.Trackintime.Date==NowDay.Date && e.Eqpid== i.Equipid).ToList().Sum(e=>e.Trackinmainqty);
+                                    EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + NowTrackIn.ToString() + "</font></td>";
+
+
+                                    var MouthTrackIn = rxrep2.RepHistTots
+                                                    .Where(e => e.Trackintime <= NowDay.Date && e.Trackintime >= MouthDay.Date && e.Eqpid == i.Equipid)
+                                                    .Sum(e => e.Trackinmainqty);
+                                    var DayInMouth = (int)NowDay.Subtract(firstDayOfMonth).TotalDays+1;
+                                    var MouthSum = (int)MouthTrackIn / DayInMouth;
+                                    EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + MouthSum.ToString() + "</font></td>";
+
+
+                                   var WeekTrackIn = rxrep2.RepHistTots
+                                                    .Where(e => e.Trackintime <= NowDay.Date && e.Trackintime >= WeekDay.Date && e.Eqpid == i.Equipid)
+                                                    .Sum(e => e.Trackinmainqty);
+                                    var DayInWeek = (int)NowDay.Subtract(firstDayOfWeek).TotalDays+1;
+                                    var WeekSum = (int)WeekTrackIn / DayInWeek;
+                                    EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + WeekSum.ToString() + "</font></td>";
+
+                                    EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + MouthTrackIn.ToString() + "</font></td>";
+
+                                    for (int Day =1; Day <=7;Day++) {
+                                        var InfoWeek = DateTime.Now.AddDays(-Day);
+                                        var InfoWeekTrackIn = rxrep2.RepHistTots.Where(e => e.Trackintime.Date==InfoWeek.Date && e.Eqpid == i.Equipid).ToList().Sum(e => e.Trackinmainqty);
+                                        EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + InfoWeekTrackIn.ToString() + "</font></td>";
+                                    }
+
+
+                                
+
+                                EmailBody += "</tr><tr bgcolor=white>   ";
+                            }
+
+                        }
+
+                        EmailBody += "</table><br><br>";
+                    }
+
+                    //键合 
+
+
+                }
+
+            }
+
+       
+
+            using (RxmesContext 键合 = new RxmesContext())
+            {
+                using (Rxrept2Context ctx = new Rxrept2Context())
+                {
+                    DateTime YesDay = DateTime.Now.AddDays(-1);
+                    var eqp = ctx.BCapagroupMoves.Where(e => e.Capagroup == "B-NID键合").ToList();
+                    int Yesterday = 0;
+                    foreach (var i in eqp)
+                    {
+                        Yesterday += ctx.RepHistTots.FromSqlInterpolated(//, tt.outdate  
+                                $@"select distinct t.*, tt.custordernumber
+                                from (select t1.*
+                                      from rep_hist_tot t1 
+                                      where t1.trackouttime >= trunc(to_date({YesDay.AddDays(-1).ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                        and t1.trackouttime < trunc(to_date({YesDay.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                      order by t1.trackouttime) t, rep_actl_h_all tt 
+                                where 1 = 1 
+                                  and t.lotid = tt.lotid(+) 
+                                  and t.lotid not like 'T%' 
+                                  and t.eqpid={i.Equipid}"
+                            ).ToList().Sum(e => e.Curmainqty);
+                        // 如果有参数，将其作为额外的参数传递给 FromSqlInterpolated 方法
+                        // , sqlParameters 
+                    }
+
+                    DateTime today = DateTime.Now;
+                    DateTime firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+                    int MonthSum = 0;
+                    foreach (var i in eqp)
+                    {
+                        MonthSum += ctx.RepHistTots.FromSqlInterpolated(//, tt.outdate  
+                                $@"select distinct t.*, tt.custordernumber
+                                from (select t1.*
+                                      from rep_hist_tot t1 
+                                      where t1.trackouttime >= trunc(to_date({firstDayOfMonth.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                        and t1.trackouttime < trunc(to_date({today.ToString("yyyy-MM-dd")}, 'yyyy/mm/dd')) + 7 / 24 
+                                      order by t1.trackouttime) t, rep_actl_h_all tt 
+                                where 1 = 1 
+                                  and t.lotid = tt.lotid(+) 
+                                  and t.lotid not like 'T%' 
+                                  and t.eqpid={i.Equipid}"
+                            ).ToList().Sum(e => e.Curmainqty);
+                    }
+
+                    EmailBody += "<font size=2 face=Arial><b>截至当前键合 MTD 产出目标:" + "1152片" + "实际月累计产出:" + MonthSum.ToString() + " 昨日产出:" + Yesterday.ToString() + " 请关注设备状态和效率<b></font>";
+
+                    EmailBody += "<font size=2 face=Arial><b>截至当前,实际返工月累计:" + "返工月累计" + " 昨日返工:" + "昨日返工" + " 片 ，请知悉！<b></font><hr>";
+                    EmailBody += "<b><hr>";
+                }
+
+                EmailBody += "<font size=2 face=Arial color=red><b>键合 昨日状态<b></font> <hr>";
+                EmailBody += "<table border=1 cellspacing=1 cellpadding=1 bgcolor=black width=72%><tr bgcolor=SkyBlue><td align=center width=5%>设备ID</td><td align=center width=5%>RUN</td><td align=center width=5%>IDLE</td><td align=center width=5%>DOWN</td> <td align=center width=5%>TEST</td>  ";
+                EmailBody += "<td align=center width=5%>TESTCW</td><td align=center width=5%>PM</td><td align=center width=5%>WAITMFG</td><td align=center width=5%>MONR</td><td align=center width=5%>WAITENG</td><td align=center width=5%>HOLDENG</td><td align=center width=5%>MONDOWN</td>   ";
+                EmailBody += "<td align=center width=5%>MONPM</td><td align=center width=5%>QCHOLD</td><td align=center width=5%>UNQC</td><td align=center width=5%>FAC</td><td align=center width=5%>SETUP</td><td align=center width=5%>SPCHOLD</td></tr>   ";
+                workbook.Cells[1, 1].Value = "设备ID";
+                workbook.Cells[1, 2].Value = "RUN";
+                workbook.Cells[1, 3].Value = "IDLE";
+                workbook.Cells[1, 4].Value = "DOWN";
+                workbook.Cells[1, 5].Value = "TEST";
+                workbook.Cells[1, 6].Value = "TESTCW";
+                workbook.Cells[1, 7].Value = "PM";
+                workbook.Cells[1, 8].Value = "WAITMFG";
+                workbook.Cells[1, 9].Value = "MONR";
+                workbook.Cells[1, 10].Value = "WAITENG";
+                workbook.Cells[1, 11].Value = "SetUp";
+                workbook.Cells[1, 12].Value = "SPCHOLD";
+                using (RxrepContext ctx = new RxrepContext())
+                {
+                    DateTime YesDay = DateTime.Now.AddDays(-1);
+                    using (Rxrept2Context ctx2 = new Rxrept2Context())
+                    {
+                        var eqp = ctx2.BCapagroupMoves.Where(e => e.Capagroup == "B-NID键合").ToList();
+                        // var List = YesDay.Date.ToString("yyyy/MM/dd");
+                        foreach (var i in eqp)
+                        {
+                            var result = ctx.RepEqpsStartEnds
+                                .FromSqlInterpolated(//, tt.outdate  
+                               /* status,
+                                          SUM((ENDDATE - CHANGEDT) * 24 * 60) AS minutes_diff*/
+
+                               $@"SELECT 
+                                             *
+                                          FROM 
+                                              rep_eqps_start_end 
+                                          WHERE 
+                                              EQPID = {i.Equipid}
+                                              AND TRUNC(CHANGEDT) = TO_DATE({YesDay.Date.ToString("yyyy/MM/dd")}, 'YYYY/MM/DD')
+                                               AND TRUNC(ENDDATE) < TO_DATE({ DateTime.Now.Date.ToString("yyyy/MM/dd")}, 'YYYY/MM/DD')"
+                           ).Select(e => new {
+                               Status = e.Status,
+                               TimeSpan = e.Enddate - e.Changedt,
+                           }).ToList();
+
+                            var EqpList = result.GroupBy(e => e.Status)
+                               .Select(e => new
+                               {
+                                   Status = e.Key,
+                                   TotalTimeSpan = e.Aggregate(TimeSpan.Zero, (total, item) => total + item.TimeSpan)
+                               }).ToList().OrderBy(e => e.Status);
+
+                            EmailBody += "<tr  bgcolor=white><td align=center width=8%><font size=2 face=Arial  color=black>" + i.Equipid + "</font></td>";
+                            workbook.Cells[ForRef, 1].Value = i.Equipid;
+                            foreach (var sta in EqpList)
+                            {
+                                if (sta.Status == "01_RUN")
+                                {
+                                    workbook.Cells[ForRef, 2].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "02_IDLE")
+                                {
+                                    workbook.Cells[ForRef, 3].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "03_DOWN")
+                                {
+                                    workbook.Cells[ForRef, 4].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "TEST" || sta.Status == "06_TEST")
+                                {
+                                    workbook.Cells[ForRef, 5].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "06_TEST_CW")
+                                {
+                                    workbook.Cells[ForRef, 6].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "04_PM")
+                                {
+                                    workbook.Cells[ForRef, 7].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "04_MON_R")
+                                {
+                                    workbook.Cells[ForRef, 8].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "WAITENG")
+                                {
+                                    workbook.Cells[ForRef, 9].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "04_SETUP")
+                                {
+                                    workbook.Cells[ForRef, 10].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status == "03_SPCHOLD")
+                                {
+                                    workbook.Cells[ForRef, 11].Value = sta.TotalTimeSpan;
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += sta.TotalTimeSpan;
+                                    EmailBody += "</font></td>";
+                                    continue;
+                                }
+                                if (sta.Status != "WAITENG" && sta.Status != "04_MON_R" && sta.Status != "04_PM" && sta.Status != "06_TEST_CW" && sta.Status != "TEST" && sta.Status != "06_TEST" && sta.Status != "03_DOWN" && sta.Status != "02_IDLE" && sta.Status != "01_RUN" && sta.Status != "04_SETUP" && sta.Status != "03_SPCHOLD")
+                                {
+                                    EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                    EmailBody += "</font></td>";
+                                }
+                            }
+                            var Length = EqpList.Count();
+                            if (0 == EqpList.Count())
+                            {
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>24";
+                                EmailBody += "</font></td>";
+                                Length = 3;
+                            }
+                            for (; Length < 17; Length++)
+                            {
+                                EmailBody += "<td align=center width=5%><font size=2 face=Arial color=black>";
+                                EmailBody += "</font></td>";
+                            }
+                        }
+
+                        EmailBody += "</tr>   ";
+                        EmailBody += "</table><br><br>";
+                        // 2 
+                        // 第二张表 ！！！！
+                        // second Table
+                        DateTime week = DateTime.Now;
+                        EmailBody += "<table border=1 cellspacing=1 cellpadding=1 bgcolor=black width=72%><tr bgcolor=SkyBlue><td align=center width=5%>EQP</td><td align=center width=5%>产能</td><td align=center width=5%>当前WIP</td><td align=center width=5%>月均产出</td>";
+                        EmailBody += "<td align=center width=5%>周均产出</td><td align=center width=5%>月累计</td>";
+                        for (int i = 1; i <= 7; i++)
+                        {
+                            EmailBody += "  <td align=center width=5%> " + week.AddDays(-i).Date.ToString("yyyy/MM/dd") + " </td>";
+                        }
+                        EmailBody += "</tr><tr  bgcolor=white>";
+                        foreach (var i in eqp)
+                        {
+
+                            EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + i.Equipid + "</font></td>";
+                            EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + "46" + "</font></td>";
+
+                            using (Rxrept2Context rxrep2 = new Rxrept2Context())
+                            {
+                                DateTime NowDay = DateTime.Now;
+                                DateTime firstDayOfMonth = new DateTime(NowDay.Year, NowDay.Month, 1);
+
+                                DateTime MouthDay = DateTime.Now.AddDays(-31);
+
+                                DateTime WeekDay = DateTime.Now.AddDays(-7);
+
+
+                                int diff = (7 + (NowDay.DayOfWeek - DayOfWeek.Monday)) % 7;
+                                DateTime firstDayOfWeek = NowDay.AddDays(-1 * diff).Date;
+
+                                var NowTrackIn = rxrep2.RepHistTots.Where(e => e.Trackintime.Date == NowDay.Date && e.Eqpid == i.Equipid).ToList().Sum(e => e.Trackinmainqty);
+                                EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + NowTrackIn.ToString() + "</font></td>";
+
+
+                                var MouthTrackIn = rxrep2.RepHistTots
+                                                .Where(e => e.Trackintime <= NowDay.Date && e.Trackintime >= MouthDay.Date && e.Eqpid == i.Equipid)
+                                                .Sum(e => e.Trackinmainqty);
+                                var DayInMouth = (int)NowDay.Subtract(firstDayOfMonth).TotalDays + 1;
+                                var MouthSum = (int)MouthTrackIn / DayInMouth;
+                                EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + MouthSum.ToString() + "</font></td>";
+
+
+                                var WeekTrackIn = rxrep2.RepHistTots
+                                                 .Where(e => e.Trackintime <= NowDay.Date && e.Trackintime >= WeekDay.Date && e.Eqpid == i.Equipid)
+                                                 .Sum(e => e.Trackinmainqty);
+                                var DayInWeek = (int)NowDay.Subtract(firstDayOfWeek).TotalDays + 1;
+                                var WeekSum = (int)WeekTrackIn / DayInWeek;
+                                EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + WeekSum.ToString() + "</font></td>";
+
+                                EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + MouthTrackIn.ToString() + "</font></td>";
+
+                                for (int Day = 1; Day <= 7; Day++)
+                                {
+                                    var InfoWeek = DateTime.Now.AddDays(-Day);
+                                    var InfoWeekTrackIn = rxrep2.RepHistTots.Where(e => e.Trackintime.Date == InfoWeek.Date && e.Eqpid == i.Equipid).ToList().Sum(e => e.Trackinmainqty);
+                                    EmailBody += "<td align=center width=8%><font size=2 face=Arial  color=black>" + InfoWeekTrackIn.ToString() + "</font></td>";
+                                }
+
+
+
+
+                                EmailBody += "</tr><tr bgcolor=white>   ";
+                            }
+
+                        }
+
+                        EmailBody += "</table><br><br>";
+                    }
+
+                    //键合 
+
+
+                }
+
+            }
+
+
+
+            return EmailBody;
+        }
+
+
+        static public String WaferStartEmailDbInserExcel(ref ExcelWorksheet workbook, int ForRef)
+        {
+            workbook.Cells[1, 2].Value = "润芯 Wafer Start汇总！";
+            workbook.Cells[1, 2].Style.Font.Color.SetColor(205, 170, 125,213);
+            for (var l =1; l < 12  ; l++)
+            {
+                workbook.Cells[1, l].Style.Font.Size = 12;
+                //worksheet.Cells[1, 1].Style.Font.Color.SetColor(Color.Blue);
+                workbook.Column(l).Width = 10;
+                workbook.Cells[1, l].Style.Fill.PatternType = ExcelFillStyle.Solid; // 设置填充模式为纯色
+
+                // 设置背景颜色为透明的特定RGB值
+                Color backgroundColor = Color.FromArgb(255,255,255, 128); // 设置透明度为128
+                workbook.Cells[1, l].Style.Fill.BackgroundColor.SetColor(backgroundColor);
+            }
+            // 设置单元格的值和背景色
+            for (var l = 1; l < 22; l++)
+            {
+                workbook.Cells[2, l].Style.Font.Size = 12;
+                //worksheet.Cells[1, 1].Style.Font.Color.SetColor(Color.Blue);
+                workbook.Column(l).Width = 10;
+                workbook.Cells[2, l].Style.Fill.PatternType = ExcelFillStyle.Solid; // 设置填充模式为纯色
+
+                // 设置背景颜色为透明的特定RGB值
+                Color backgroundColor = Color.FromArgb(0, 255, 127, 128); // 设置透明度为128
+                workbook.Cells[2, l].Style.Fill.BackgroundColor.SetColor(backgroundColor);
+            }
+            workbook.Cells[2, 1].Value = "SIZE";
+            workbook.Cells[2, 2].Value = "工艺大类";
+            workbook.Cells[2, 2, 2, 4].Merge = true;
+            workbook.Cells[2, 5].Value = "BP投料目标";
+            workbook.Cells[2, 5, 2, 6].Merge = true;
+            workbook.Cells[2, 7].Value = "BP投料计划";
+            workbook.Cells[2, 7, 2, 8].Merge = true;
+            workbook.Cells[2, 9].Value = "MF1+6投料目标";
+            workbook.Cells[2, 9, 2, 10].Merge = true;
+            workbook.Cells[2,11].Value = "MF1+6投料计划";
+            workbook.Cells[2, 11, 2, 12].Merge = true;
+            workbook.Cells[2, 13].Value = "实际投料";
+            workbook.Cells[2, 13, 2, 14].Merge = true;
+            workbook.Cells[2, 15].Value = "产能";
+            workbook.Cells[2, 16].Value = "WIP";
+            workbook.Cells[2, 17].Value = "在线利用率";
+            workbook.Cells[2, 17, 2, 18].Merge = true;
+            workbook.Cells[2, 19].Value = "BP达成率";
+            workbook.Cells[2, 19, 2, 20].Merge = true;
+            workbook.Cells[2, 21].Value = "MF达成率";
+            workbook.Cells[2, 21, 2, 22].Merge = true;
+            // 合并单元格，并设置值
+
+            String EmailBody = "";
+
+            return EmailBody;
+        }
+    }
+}

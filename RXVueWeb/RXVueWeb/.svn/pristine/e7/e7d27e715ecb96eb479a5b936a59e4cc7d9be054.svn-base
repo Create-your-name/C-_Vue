@@ -1,0 +1,52 @@
+﻿<template>
+   
+
+    <el-form :model="form" label-width="120px">
+        <div class="mb-2 flex items-center text-sm">
+            <el-radio-group v-model="radio1" class="ml-4">
+                <el-radio label="1" size="large " style="margin-right:500px">总异常踢片报表</el-radio>
+                <el-radio label="2" size="large" style="margin-left:350px">异常责任部门报表</el-radio>
+            </el-radio-group>
+        </div>
+        <el-divider>
+            <el-icon><HomeFilled /></el-icon>
+        </el-divider>
+
+        <div class="Ocap_Fill">
+            <span class="demonstration" style="float:left ;margin-left:50px;">异常单填写日期</span>
+            <el-date-picker v-model="value1"
+                            type="datetimerange"
+                            start-placeholder="Start Date"
+                            end-placeholder="End Date"
+                            :default-time="defaultTime2"
+                            style="float:left  ; margin-left:30px;" />
+        </div>
+
+        <div class="Ocap_Aplsh">
+            <span class="demonstration" style="float:left ;margin-left:50px;">异常单完成日期</span>
+            <el-date-picker v-model="value2"
+                            type="datetimerange"
+                            start-placeholder="Start Date"
+                            end-placeholder="End Date"
+                            :default-time="defaultTime2"
+                            style="float:left ;margin-left:30px;" />
+        </div>
+        
+
+    </el-form>
+</template>
+
+
+<script scorp setup>
+    import { ref } from 'vue'
+    const radio1 = ref('1')
+    const value1 = ref('')
+    const value2 = ref('')
+
+
+
+</script>
+
+<style>
+   
+</style>

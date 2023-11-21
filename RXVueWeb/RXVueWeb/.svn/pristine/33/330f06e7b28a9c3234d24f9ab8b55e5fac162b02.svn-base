@@ -1,0 +1,42 @@
+﻿<template>
+  <div>
+    <el-form ref="form" :model="form" :rules="rules" action="http://10.163.76.11/MES/pms_report/out/rep_FAB_capagroup_move_yest.asp" method="post">
+      <el-form-item label="选择项" prop="select1">
+        <el-select v-model="form.select1" placeholder="请选择">
+          <el-option label="H2O2" value="H2O2"></el-option>
+          <el-option label="其他选项" value="其他选项"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm">提交</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      form: {
+        select1: 'H2O2'
+      },
+      rules: {
+        select1: [
+          { required: true, message: '请选择选择项', trigger: 'change' }
+        ]
+      }
+    }
+  },
+  methods: {
+    submitForm() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
+          // 提交表单
+          this.$refs.form.$el.submit();
+        }
+      });
+    }
+  }
+}
+</script> 

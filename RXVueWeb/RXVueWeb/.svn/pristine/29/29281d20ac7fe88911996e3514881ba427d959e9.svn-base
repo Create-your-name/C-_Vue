@@ -1,0 +1,445 @@
+﻿<template>
+    <el-form :model="form" label-width="120px" ref="ruleForm">
+        <el-tabs v-model="activeName" type="card" class="demo-tabs" @tab-click="handleClick">
+            <el-tab-pane label="总异常剔片报表" name="first" style=" margin-left:50px">
+                <el-divider>
+                    <el-icon>
+                        <HomeFilled />
+                    </el-icon>
+                </el-divider>
+                <el-form-item label="异常单填写日期" prop="f_YC_DataFill">
+                    <el-date-picker v-model="form.f_YC_DataFill" type="datetimerange"
+                                    :picker-options="pickerOptions"
+                                    start-placeholder="Start Date"
+                                    end-placeholder="End Date" :default-time="defaultTime2" style="width:50%" />
+                </el-form-item>
+
+                <el-form-item label="异常单完成日期" prop="f_YC_AcomData">
+                    <el-date-picker v-model="form.f_YC_AcomData" type="datetimerange"
+                                    :picker-options="pickerOptions"
+                                    start-placeholder="Start Date"
+                                    end-placeholder="End Date" :default-time="defaultTime2" style="width:50%" />
+                </el-form-item>
+
+                <el-row class="row-bg" justify="space-evenly">
+                    <el-col :span="12">
+                        <el-form-item label="异常单号" prop="f_Yc_Odd">
+                            <el-input v-model="form.f_Yc_Odd" style="width:200px" />
+                            <el-select v-model="form.f_Yc_Odd" class="filter-item" placeholder="输入您所需的异常单号">
+                                <el-option v-for="item in uniqueKey(tableData,'no')" :key="item.no" :label="item.no" :value="item.no" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="批号" prop="f_LOT">
+                            <el-input v-model="form.f_LOT" style="width:200px" />
+                            <el-select v-model="form.f_LOT" placeholder="输入您所需的批号">
+                                <el-option v-for="item in uniqueKey(tableData,'ph')" :key="item.ph" :label="item.ph" :value="item.ph" />
+
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row class="row-bg" justify="space-evenly">
+                    <el-col :span="6">
+                        <el-form-item label="工    艺" prop="f_Pro">
+                            <el-select v-model="form.f_Pro" placeholder="输入您所需的工艺名称">
+                                <el-option v-for="item in uniqueKey(tableData,'gy')" :key="item.gy" :label="item.gy"
+                                           :value="item.gy" />
+
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="Equip ID" prop="f_Equip_ID">
+                            <el-select v-model="form.f_Equip_ID" placeholder="输入您所需的设备名称">
+                                <el-option v-for="item in uniqueKey(tableData,'equipid')" :key="item.equipid" :label="item.equipid"
+                                           :value="item.equipid" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="工程师确认部门" prop="f_OP_Depart">
+                            <el-select v-model="form.f_OP_Depart" placeholder="输入您所需的部门名称">
+                                <el-option v-for="item in uniqueKey(tableData,'ycclBm')" :key="item.ycclBm" :label="item.ycclBm"
+                                           :value="item.ycclBm" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-radio v-model="form.f_bf_NoNull" label="1">工程师报废非0</el-radio>
+                    </el-col>
+                </el-row>
+
+                <el-row class="row-bg" justify="space-evenly">
+                    <el-col :span="6">
+                        <el-form-item label="工艺大类" prop="f_Pro_Kind">
+                            <el-select v-model="form.f_Pro_Kind" placeholder="输入您所需的工艺大类">
+                                <el-option v-for="item in uniqueKey(tableData,'gy')" :key="item.gy" :label="item.gy"
+                                           :value="item.gy" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="责任部门一" prop="f_Res_Depart">
+                            <el-select v-model="form.f_Res_Depart" placeholder="输入所对应的责任部门一">
+                                <el-option v-for="item in uniqueKey(tableData,'clbm')" :key="item.clbm" :label="item.clbm"
+                                           :value="item.clbm" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="工程师确认现象" prop="f_OP_Pheno">
+                            <el-select v-model="form.f_OP_Pheno" placeholder="请确认现象 ">
+                                <el-option v-for="item in uniqueKey(tableData,'zxyc')" :key="item.zxyc" :label="item.zxyc"
+                                           :value="item.zxyc" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-radio v-model="form.f_ReHu" label="2">不包含拒绝或挂起</el-radio>
+                    </el-col>
+                </el-row>
+
+                <el-row class="row-bg" justify="space-evenly">
+                    <el-col :span="6">
+                        <el-form-item label="产品名称" prop="f_Product_name">
+                            <el-select v-model="form.f_Product_name" placeholder="请输入产品名称">
+                                <el-option v-for="item in uniqueKey(tableData,'cppz')" :key="item.cppz" :label="item.cppz"
+                                           :value="item.cppz" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="责任部门二" prop="f_Res_Depart_2">
+                            <el-select v-model="form.f_Res_Depart_2" placeholder="请输入责任部门二">
+                                <el-option v-for="item in uniqueKey(tableData,'clbm')" :key="item.clbm" :label="item.clbm"
+                                           :value="item.clbm" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-form-item label="工程师确认层次" prop="f_OP_Level">
+                            <el-select v-model="form.f_OP_Level" placeholder="请确认层次">
+                                <el-option v-for="item in uniqueKey(tableData,'ycclcc')" :key="item.ycclcc" :label="item.ycclcc"
+                                           :value="item.ycclcc" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-radio v-model="form.f_ReHu" label="1" prop="Only_Reject_Suspend">只查看挂起或拒绝</el-radio>
+                    </el-col>
+                </el-row>
+
+                <el-row class="row-bg" justify="space-evenly">
+                    <el-col :span="8">
+                        <el-form-item label="确认意见" prop="f_Idea">
+                            <el-select v-model="form.f_Idea" placeholder="请输入您的意见">
+                                <el-option v-for="item in uniqueKey(tableData,'cpownerQryj')" :key="item.cpownerQryj" :label="item.cpownerQryj"
+                                           :value="item.cpownerQryj" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="异常原因归类" prop="f_Cause_Range">
+                            <el-select v-model="form.f_Cause_Range" placeholder="请选择异常原因">
+                                <el-option v-for="item in uniqueKey(tableData,'ycyygl')" :key="item.ycyygl" :label="item.ycyygl"
+                                           :value="item.ycyygl" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <!--   @change="getDataList()" @clear="getDataList()" @focus="get_OP_Class"-->
+                        <el-form-item label="工程师确认分类" prop="f_OP_Class">
+                            <el-select v-model="form.f_OP_Class" placeholder="请确认分类">
+                                <el-option v-for="item in uniqueKey(tableData,'ycclFl')" :key="item.ycclFl" :label="item.ycclFl"
+                                           :value="item.ycclFl" />
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+
+                </el-row>
+
+                <el-form-item label="当前状态" prop="status">
+                    <el-checkbox-group v-model="form.status">
+                        <el-radio v-model="form.status" label="1">工程师确认</el-radio>
+                        <el-radio v-model="form.status" label="2">主管确认</el-radio>
+                        <el-radio v-model="form.status" label="3">产品OWNER处理</el-radio>
+                        <el-radio v-model="form.status" label="4">同意处置结束</el-radio>
+                        <el-radio v-model="form.status" label="5">重新处置结束</el-radio>
+                    </el-checkbox-group>
+                </el-form-item>
+
+                <!--<el-form-item label="请选择查询栏位">
+                    <el-button type="primary">
+                        <router-link to="/ListSelect">选择 </router-link>
+                    </el-button>
+                </el-form-item>
+
+                <el-form-item label="排序">
+                    <el-text class="mx-1" type="danger" style="margin-left:50px">第一顺序</el-text>
+                    <el-select v-model="form.region" placeholder="第一顺序">
+                        <el-option label="Zone one" value="shanghai" />
+                        <el-option label="Zone two" value="beijing" />
+                    </el-select>
+                    <el-text class="mx-1" type="primary" style="margin-left:50px">第二顺序</el-text>
+                    <el-select v-model="form.region2" placeholder="第二顺序">
+                        <el-option label="Zone one" value="shanghai" />
+                        <el-option label="Zone two" value="beijing" />
+                    </el-select>
+                </el-form-item>-->
+
+                <el-button @click="getDataList()"> 查询</el-button>
+                <el-table :data="formData" border style="width: 100%" v-horizontal-scroll="'always'">
+                    <el-table-column fixed="left" prop="no" label="TASKID" width="180" />
+                    <el-table-column fixed="left" label="ABNORM CARD" width="100" />
+                    <el-table-column fixed="left" prop="ph" label="批号" width="100" />
+                    <el-table-column fixed="left" prop="cppz" label="产品总类" width="100" />
+                    <el-table-column fixed="left" prop="recipeid" label="RecipeID" width="100" />
+                    <el-table-column prop="lps" label="来片数" width="100" />
+                    <el-table-column prop="kyps" label="可疑片数" width="100" />
+                    <el-table-column prop="gy" label="工艺" width="150" />
+                    <el-table-column prop="lottype" label="LOTTYPE" width="100" />
+                    <el-table-column prop="location" label="LOCATION" width="100" />
+                    <el-table-column prop="stage" label="STAGE" width="100" />
+                    <el-table-column prop="equipid" label="EQUIP ID" width="100" />
+                    <el-table-column prop="cpowner" label="产品OWNER" width="100" />
+                    <el-table-column prop="zxyc" label="异常现象" width="100" />
+                    <el-table-column prop="clbm" label="处理部门" width="100" />
+                    <el-table-column prop="tzgcs" label="通知工程师" width="100" />
+                    <el-table-column prop="xxms" label="现象描述" width="300" />
+                    <el-table-column prop="applyDate" label="发现日期" width="100" />
+                    <el-table-column prop="applyName" label="发现人" width="100" />
+                    <el-table-column prop="ycclBm" label="异常部门" width="100" />
+                    <el-table-column prop="ycclXz" label="异常现象" width="100" />
+                    <el-table-column prop="ycclFl" label="异常分类" width="100" />
+                    <el-table-column prop="ycclcc" label="异常层次" width="100" />
+                    <el-table-column prop="yocap" label="有无OCAP" width="100" />
+                    <el-table-column prop="ycms" label="工程师对异常的描述" width="200" />
+                    <el-table-column prop="ycxxqr" label="工程师确认的异常现象" width="100" />
+                    <el-table-column prop="ycyygl" label="异常原因归类" width="100" />
+                    <el-table-column prop="cbyyfx" label="初步原因分析" width="200" />
+                    <el-table-column prop="ycid" label="异常EQUIPID" width="150" />
+                    <el-table-column prop="ycms" label="设备/菜单临时措施" width="250" />
+                    <el-table-column prop="sftzowner" label="是否通知产品OWNER/FMA" width="100" />
+                    <el-table-column label="工程师异常放行" width="100" />
+                    <el-table-column label="工程师返工" width="100" />
+                    <el-table-column label="工程师报废" width="100" />
+                    <el-table-column label="工程师正常放行" width="100" />
+                    <el-table-column prop="ycclgcs" label="处理工程师" width="100" />
+                    <el-table-column prop="ycqrQrzgQrrq" label="处理日期" width="100" />
+                    <el-table-column prop="cpownerQryj" label="确认意见" width="100" />
+                    <el-table-column prop="cpownerYcdj" label="异常等级" width="100" />
+                    <el-table-column label="再处理异常放行" width="100" />
+                    <el-table-column label="再处理返工" width="100" />
+                    <el-table-column label="再处理在处理报废" width="100" />
+                    <el-table-column label="再处理正常放行" width="100" />
+                    <el-table-column prop="cpowmerQzyx" label="产品潜在影响" width="100" />
+                    <el-table-column prop="cpownerSfxyzrbmyyfx" label="是否需要责任部门原因分析" width="100" />
+                    <el-table-column prop="cpownerSfkmrb" label="是否开MRB" width="100" />
+                    <el-table-column prop="cponwerName" label="确认工程师" width="100" />
+                    <el-table-column prop="cpownerRq" label="确认日期" width="100" />
+                    <el-table-column label="表单状态" width="100" />
+                    <el-table-column label="是否挂起" width="100" />
+                    <el-table-column label="被谁拒绝" width="100" />
+                    <el-table-column label="过程" width="100" />
+                    <el-table-column prop="location" label="责任部门一" width="100" />
+                    <el-table-column label="报废" width="100" />
+                    <el-table-column label="返工" width="100" />
+                    <el-table-column label="异常放行" width="100" />
+                    <el-table-column label="正常放行" width="100" />
+                    <el-table-column label="原因六大类" width="100" />
+                    <el-table-column prop="ycclBm" label="责任部门二" width="100" />
+                    <el-table-column label="报废" width="100" />
+                    <el-table-column label="返工" width="100" />
+                    <el-table-column label="异常放行" width="100" />
+                    <el-table-column label="正常放行" width="100" />
+                    <el-table-column label="原因六大类" width="100" />
+                    <el-table-column label="备注" width="100" />
+                </el-table>
+                <!--                <TableInfo :tableData="formData" />-->
+                <!--                <TableInfo :tableData="formData" v-show="dialog_visible" >查询</TableInfo>-->
+            </el-tab-pane>
+
+
+            <el-tab-pane label="异常责任部门报表" name="second" style="margin-left:50px;height:90%;overflow-y:auto;overflow-x:hidden; width:100%" class="UserTable">
+                <!--<el-table :data="tableData" border style="width: 100%" v-horizontal-scroll="'always'">
+                    <el-table-column fixed="left" prop="ph" label="批号" width="100" />
+                    <el-table-column fixed="left" prop="cppz" label="产品总类" width="100" />
+                    <el-table-column fixed="left" prop="recipeid" label="RecipeID" width="100" />
+                    <el-table-column prop="lps" label="来片数" width="100" />
+                    <el-table-column prop="kyps" label="可疑片数" width="100" />
+                    <el-table-column prop="gy" label="工艺" width="150" />
+                    <el-table-column prop="lottype" label="LOTTYPE" width="100" />
+                    <el-table-column prop="location" label="LOCATION" width="100" />
+                    <el-table-column prop="stage" label="STAGE" width="100" />
+                    <el-table-column prop="equipid" label="EQUIP ID" width="100" />
+                    <el-table-column prop="cpowner" label="产品OWNER" width="100" />
+                    <el-table-column prop="zxyc" label="异常现象" width="100" />
+                    <el-table-column prop="clbm" label="处理部门" width="100" />
+                    <el-table-column prop="tzgcs" label="通知工程师" width="100" />
+                    <el-table-column prop="xxms" label="现象描述" width="300" />
+                    <el-table-column prop="applyDate" label="发现日期" width="100" />
+                    <el-table-column prop="applyName" label="发现人" width="100" />
+                    <el-table-column prop="ycclBm" label="异常部门" width="100" />
+                    <el-table-column prop="ycclXz" label="异常现象" width="100" />
+                    <el-table-column prop="ycclFl" label="异常分类" width="100" />
+                    <el-table-column prop="ycclcc" label="异常层次" width="100" />
+                    <el-table-column prop="yocap" label="有无OCAP" width="100" />
+                    <el-table-column prop="ycms" label="工程师对异常的描述" width="200" />
+                    <el-table-column prop="ycxxqr" label="工程师确认的异常现象" width="100" />
+                    <el-table-column prop="ycyygl" label="异常原因归类" width="100" />
+                    <el-table-column prop="cbyyfx" label="初步原因分析" width="200" />
+                    <el-table-column prop="ycid" label="异常EQUIPID" width="150" />
+                    <el-table-column prop="ycms" label="设备/菜单临时措施" width="150" />
+                    <el-table-column prop="sftzowner" label="是否通知产品OWNER/FMA" width="100" />
+                    <el-table-column label="工程师异常放行" width="100" />
+                    <el-table-column label="工程师返工" width="100" />
+                    <el-table-column label="工程师报废" width="100" />
+                    <el-table-column label="工程师正常放行" width="100" />
+                    <el-table-column prop="ycclgcs" label="处理工程师" width="100" />
+                    <el-table-column prop="ycqrQrzgQrrq" label="处理日期" width="100" />
+                    <el-table-column prop="cpownerQryj" label="确认意见" width="100" />
+                    <el-table-column prop="cpownerYcdj" label="异常等级" width="100" />
+                    <el-table-column label="再处理异常放行" width="100" />
+                    <el-table-column label="再处理返工" width="100" />
+                    <el-table-column label="再处理在处理报废" width="100" />
+                    <el-table-column label="再处理正常放行" width="100" />
+                    <el-table-column prop="cpowmerQzyx" label="产品潜在影响" width="100" />
+                    <el-table-column prop="cpownerSfxyzrbmyyfx" label="是否需要责任部门原因分析" width="100" />
+                    <el-table-column prop="cpownerSfkmrb" label="是否开MRB" width="100" />
+                    <el-table-column prop="cponwerName" label="确认工程师" width="100" />
+                    <el-table-column prop="cpownerRq" label="确认日期" width="100" />
+                    <el-table-column label="表单状态" width="100" />
+                    <el-table-column label="是否挂起" width="100" />
+                    <el-table-column label="被谁拒绝" width="100" />
+                    <el-table-column label="过程" width="100" />
+                    <el-table-column prop="location" label="责任部门一" width="100" />
+                    <el-table-column label="报废" width="100" />
+                    <el-table-column label="返工" width="100" />
+                    <el-table-column label="异常放行" width="100" />
+                    <el-table-column label="正常放行" width="100" />
+                    <el-table-column label="原因六大类" width="100" />
+                    <el-table-column prop="ycclBm" label="责任部门二" width="100" />
+                    <el-table-column label="报废" width="100" />
+                    <el-table-column label="返工" width="100" />
+                    <el-table-column label="异常放行" width="100" />
+                    <el-table-column label="正常放行" width="100" />
+                    <el-table-column label="原因六大类" width="100" />
+                    <el-table-column label="备注" width="100" />
+                </el-table>-->
+                <TableInfo :tableData="tableData" />
+                <!--                <router-link to="Tab">异常责任部门报表显示</router-link>-->
+            </el-tab-pane>
+
+            <!-- router.push(
+                {
+                    path: '/Tab',
+                    query: {
+                        tableData: this.formData
+                    }
+                        import router from "@/router/index"
+                }
+            )-->
+        </el-tabs>
+
+
+
+
+        <!--   FormInfo() {
+           router.push(
+           {
+           path: '/Tab',
+           query: {
+           tableData: this.form
+           }
+           }
+           )
+           },-->
+
+
+    </el-form>
+    <!--   <button @click="getValue()">获取</button>-->.
+
+    <!--         this.$router.push({ name: "/Tab", query: { Data:JSON.stringify(this.formData)} })    "    路由push传递参数  -->
+</template>
+
+<script>
+    import axios from "axios";
+    import TableInfo from "./TabInfo.vue"
+    // do not use same name with ref
+
+    //  _YC_DataFill: "", // 异常单填写时间
+    //  _YC_AcomData: "", //异常单完成时间
+
+    export default {
+    components: {
+        TableInfo
+        },
+        data() {
+            return {
+                form: {
+                f_YC_DataFill: [], // 异常单填写时间
+                f_YC_AcomData: [], //异常单完成时间
+                f_Yc_Odd: "", //异常单号
+                f_LOT: "", //批号             4
+                f_Pro: "", //工艺
+                f_Equip_ID: "", //设备ID      2
+                f_OP_Depart: "", //工程师确认部门
+                f_Pro_Kind: "", //工艺大类
+                f_Res_Depart: "", //责任部门1
+                f_OP_Pheno: "", //工程师确认现象
+                f_Product_name: "", //产品名称
+                f_Res_Depart_2: "", //责任部门2
+                f_OP_Level: "", //工程师确认层次
+                f_Idea: "", //意见        3
+                f_Cause_Range: "", //异常原因归类 1
+                f_OP_Class: "", //工程师确认分类
+                f_bf_NoNull: "", //
+                status: "",         //当前状态
+                region: "",  //排序1
+                region2: "", //排序2
+                f_ReHu:"",
+                },
+                tableData: [],
+                formData: [],
+            };
+        },
+    methods: {
+        setup() {
+
+         },
+        getDataList() {
+                axios.post("https://localhost:7155/DepartMent/Lot", this.form)
+                    .then((res) => {
+                        this.formData = res.data;
+                        console.log(this.formData)       
+                    }).catch(err => {
+                           console.log(err)
+                    })
+            },
+            uniqueKey(array, key) {
+                return array.reduce((result, item) => {
+                    if (!result.find(e => e[key]===item[key])&&item[key]!=null) {
+                        result.push(item);
+                    }
+                    return result;
+                }, []);
+            },
+            QueryDepartList() {
+                axios
+                    .get("https://localhost:7155/DepartMent")
+                    .then((res) => {
+                        this.tableData = res.data;
+                    })
+            },
+            getValue() {
+               
+            }
+        },
+        mounted() {
+            this.QueryDepartList();
+        },
+    };
+</script>

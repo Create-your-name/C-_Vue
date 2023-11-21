@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace webapi.Entity.Rxrep;
+
+public partial class VMfgHoldLastest
+{
+    public string Lotid { get; set; } = null!;
+
+    public string? Productname { get; set; }
+
+    public string? Productrevision { get; set; }
+
+    public string? Planname { get; set; }
+
+    public string? Planrevision { get; set; }
+
+    public string? Stepseq { get; set; }
+
+    public string? Stepid { get; set; }
+
+    public decimal? Priority { get; set; }
+
+    public decimal? Qty { get; set; }
+
+    public string? Holdreason { get; set; }
+
+    public string? Stage { get; set; }
+
+    public string? Stepdescription { get; set; }
+
+    public string? Area { get; set; }
+
+    public DateTime? HoldDate { get; set; }
+
+    public string? Holdby { get; set; }
+
+    public string? Comm { get; set; }
+
+    public string? Equipment { get; set; }
+
+    public string? Equipgroup { get; set; }
+
+    public string? Holdreason0 { get; set; }
+
+    public string? Holdcomment0 { get; set; }
+
+    public string? Commentcode { get; set; }
+
+    public decimal? Layerno { get; set; }
+
+    public string? Processtype { get; set; }
+
+    public string? Lotowner { get; set; }
+
+    public string? Ordertype { get; set; }
+}

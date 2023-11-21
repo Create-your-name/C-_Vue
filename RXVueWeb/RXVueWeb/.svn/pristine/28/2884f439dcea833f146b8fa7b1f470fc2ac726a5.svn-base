@@ -1,0 +1,44 @@
+﻿/*import ocap from '@/view/o-cap.vue'*//*
+import ListSelect from '@/view/ListSelect.vue'*/
+
+
+const routes = [
+    {
+        path: '/',
+        redirect: '/o-cap'
+    },
+    {
+        name: "ocap",
+        path: "/o-cap",
+        component: () => import('@/view/o-cap.vue')
+    },
+    {
+        name: '/Tab',
+        path: '/Tab',
+        component: () => import('@/view/TabInfo.vue'),
+        props: (route) => ({
+            tableData: route.query.tableData,
+        })
+    },
+    {
+        name: '/2',
+        path: '/2',
+        component: () => import('@/view/ProInfo/ProInfo.vue'),
+    },
+    {
+        name: '/3',
+        path: '/3',
+        component: () => import('@/view/Charts/WipChart.vue'),
+    },
+    {
+        name: '/4',
+        path: '/4',
+        component: () => import('@/view/Charts/WipOut.vue'),
+    },
+     {
+        name: '/5',
+        path: '/5',
+        component: () => import('@/view/LJ/jodeCode.vue'),
+    }
+];
+export default routes

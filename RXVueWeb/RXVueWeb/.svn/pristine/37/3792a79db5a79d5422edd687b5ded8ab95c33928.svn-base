@@ -1,0 +1,83 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+using System.Data;
+using webapi.Models;
+using System.Linq;
+using Microsoft.AspNetCore.Cors;
+using webapi.Bean;
+using static webapi.Bean.FormData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.EntityFrameworkCore.Internal;
+
+namespace webapi.Controllers
+{
+    [Route("[controller]")]
+    [ApiController]
+    public class DepartMentController : ControllerBase
+    {
+
+        private readonly ModelContext _context;
+
+        [HttpGet]
+        [EnableCors("DepartMent")]
+        public IEnumerable<RxFormProductUnusual> GetAll()
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+                var Department = ctx.RxFormProductUnusuals.ToList();
+                foreach (var Depart in Department) if (!String.IsNullOrEmpty(Depart.No)) Depart.No += "_异常单";
+                return Department;
+            }
+        }
+
+        [HttpPost("Lot")]
+        [EnableCors("DepartMent")]
+        public List<RxFormProductUnusual> GetLotALL(Bean.FormData.Data Data)
+        {
+            using (Models.ModelContext ctx = new Models.ModelContext())
+            {
+
+                     var Time = ctx.BpmiTokens
+                    .Where(e => Data.f_YC_DataFill.Length != 2 ? true : e.Receivetime > Convert.ToDateTime(Data.f_YC_DataFill[0]) && e.Receivetime < Convert.ToDateTime(Data.f_YC_DataFill[1]))
+                    .Where(e => Data.f_YC_AcomData.Length != 2 ? true : e.Finishtime > Convert.ToDateTime(Data.f_YC_AcomData[0]) && e.Finishtime < Convert.ToDateTime(Data.f_YC_AcomData[1])).ToList();
+
+                    var Find_DePartMent = ctx.RxFormProductUnusuals
+                    .Join(ctx.BpmiTokens, x => x.Taskid, y => y.Taskid, (x, y) => x).Distinct()
+                    .Where(e => String.IsNullOrEmpty(Data.f_Cause_Range) ? true : e.Ycyygl == Data.f_Cause_Range)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Equip_ID) ? true : e.Equipid == Data.f_Equip_ID)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Idea) ? true : e.CpownerQryj == Data.f_Idea)
+                    .Where(e => String.IsNullOrEmpty(Data.f_LOT) ? true : e.Ph == Data.f_LOT)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Class) ? true : e.YcclFl == Data.f_OP_Class)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Depart) ? true : e.YcclBm == Data.f_OP_Depart)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Level) ? true : e.Ycclcc == Data.f_OP_Level)
+                    .Where(e => String.IsNullOrEmpty(Data.f_OP_Pheno) ? true : e.Zxyc == Data.f_OP_Pheno)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Pro) ? true : e.Gy == Data.f_Pro)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Pro_Kind) ? true : true)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Product_name) ? true : e.Cppz == Data.f_Product_name)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart) ? true : e.Clbm == Data.f_Res_Depart)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Res_Depart_2) ? true : true)
+                    .Where(e => String.IsNullOrEmpty(Data.f_Yc_Odd) ? true : e.No == Data.f_Yc_Odd)
+                     .ToList();
+                foreach (var Depart in Find_DePartMent) if (!String.IsNullOrEmpty(Depart.No)) Depart.No += "_异常单";
+                List<RxFormProductUnusual> rusult = new List<RxFormProductUnusual>();
+                foreach (var i in Find_DePartMent)
+                    foreach (var y in Time)
+                        if (i.Taskid == y.Taskid)
+                            rusult.Add(i);
+
+
+
+/*                List<RxFormProductUnusual> rusult2 = new List<FormShow>();
+                rusult2 = (FormShow)rusult;
+
+*/
+
+                return rusult.ToList();
+            }
+        }
+
+        /*        public record FormData( String data);*/
+    }
+}
