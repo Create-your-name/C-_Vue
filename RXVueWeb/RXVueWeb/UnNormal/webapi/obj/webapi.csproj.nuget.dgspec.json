@@ -50,9 +50,9 @@
               "target": "Package",
               "version": "[23.4.0, )"
             },
-            "EPPlus": {
+            "DocumentFormat.OpenXml": {
               "target": "Package",
-              "version": "[6.2.10, )"
+              "version": "[3.0.0, )"
             },
             "ExcelPackage": {
               "target": "Package",
@@ -60,7 +60,15 @@
             },
             "Hangfire": {
               "target": "Package",
-              "version": "[1.8.5, )"
+              "version": "[1.8.6, )"
+            },
+            "Hangfire.AspNetCore": {
+              "target": "Package",
+              "version": "[1.8.6, )"
+            },
+            "Hangfire.Core": {
+              "target": "Package",
+              "version": "[1.8.6, )"
             },
             "Hangfire.MemoryStorage": {
               "target": "Package",
@@ -79,6 +87,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[7.0.5, )"
+            },
+            "Microsoft.Office.Interop.Excel": {
+              "target": "Package",
+              "version": "[15.0.4795.1001, )"
             },
             "Microsoft.Office.Interop.Outlook": {
               "target": "Package",
@@ -111,6 +123,14 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "System.ComponentModel": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            },
+            "System.ComponentModel.Annotations": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             },
             "System.Net.Http": {
               "target": "Package",

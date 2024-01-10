@@ -279,6 +279,12 @@
         chkHoldMonInput.value = 'on';
         form.appendChild(chkHoldMonInput);
 
+        let chkNBMonInput = document.createElement('input');
+        chkNBMonInput.type = 'hidden';
+        chkNBMonInput.name = 'chk_neibu';
+        chkNBMonInput.value = 'on';
+        form.appendChild(chkNBMonInput);
+
         let lstDuehourInput = document.createElement('input');
         lstDuehourInput.type = 'hidden';
         lstDuehourInput.name = 'lst_Duehour';
@@ -398,6 +404,12 @@
             chkHoldMonInput.name = 'chk_holdMon';
             chkHoldMonInput.value = 'on';
             form.appendChild(chkHoldMonInput);
+            
+        let chkNBMonInput = document.createElement('input');
+        chkNBMonInput.type = 'hidden';
+        chkNBMonInput.name = 'chk_neibu';
+        chkNBMonInput.value = 'on';
+        form.appendChild(chkNBMonInput);
 
             let lstDuehourInput = document.createElement('input');
             lstDuehourInput.type = 'hidden';
@@ -505,6 +517,13 @@
             chkHoldMonInput.name = 'chk_holdMon';
             chkHoldMonInput.value = 'on';
             form.appendChild(chkHoldMonInput);
+
+            
+        let chkNBMonInput = document.createElement('input');
+        chkNBMonInput.type = 'hidden';
+        chkNBMonInput.name = 'chk_neibu';
+        chkNBMonInput.value = 'on';
+        form.appendChild(chkNBMonInput);
 
             let lstDuehourInput = document.createElement('input');
             lstDuehourInput.type = 'hidden';

@@ -6,6 +6,7 @@ using webapi.Bean.Chart;
 using webapi.Entity.Api;
 using webapi.Service.CMP_SPTS_Email;
 using webapi.Service.DynCTSummary_Email;
+using webapi.Service.Email.OEE_Email;
 using webapi.Service.Email.WaferStart_Email;
 using webapi.Util;
 
@@ -25,6 +26,8 @@ namespace webapi.Controllers.Email
             ct2.SendCmpEmail();
             WaferStart_Email waferStart = new WaferStart_Email();
             waferStart.SendWaferStartEmail();
+            OEEEmail oee = new OEEEmail();
+            oee.SendOEEEmail();
 
 
             /*

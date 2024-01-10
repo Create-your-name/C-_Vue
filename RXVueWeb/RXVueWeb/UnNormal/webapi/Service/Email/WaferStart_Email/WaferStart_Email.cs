@@ -17,7 +17,7 @@ namespace webapi.Service.Email.WaferStart_Email
                       sendTO.Add("caolianying1@rxgz.crmicro.com");
                       sendTO.Add("liutao511@rxgz.crmicro.com");*/
 
-            //sendTO.Add("runxin_shengchanyingyunbudep@rxgz.crmicro.com");
+            sendTO.Add("runxin_shengchanyingyunbudep@rxgz.crmicro.com");
             /*               sendTO.Add("guojiahui@csmc.crmicro.com");
               sendTO.Add("gaojw@csmc.crmicro.com");
   */
@@ -48,7 +48,7 @@ namespace webapi.Service.Email.WaferStart_Email
             EmailBody += "<Table border='1' cellspacing='1' cellpadding='1' bgcolor='black' width='100%' ><tr bgcolor=SkyBlue align='center'><td colspan=2>工艺大类</td><td colspan=2>BP投料目标</td><td colspan=2>BP投料计划</td>";
             EmailBody += "<td colspan=2>MF1+6投料目标</td><td colspan=2>MF1+6投料计划</td><td colspan=2>实际投料</td><td >产能</td><td >WIP</td><td >在线利用率</td><td colspan=2>BP达成率</td><td colspan=2>MF达成率</td></tr>";
             //      <td >SIZE</td>
-            EmailBody += "<tr bgcolor=SkyBlue align='center'><td >Process</td><td >Type</td><td >BP PCS</td><td >BP KLayer</td><td >WS Acc. Plan</td><td >WS Acc. Plan(K/L)</td><td >MF PCS</td><td >MF KLayer</td><td >WS Acc. Plan</td><td >WS Acc. Plan(K/L)</td>";
+            EmailBody += "<tr bgcolor=SkyBlue align='center'><td >Process</td><td >Type</td><td >BP PCS</td><td >BP Layer</td><td >WS Acc. Plan</td><td >WS Acc. Plan(K/L)</td><td >MF PCS</td><td >MF Layer</td><td >WS Acc. Plan</td><td >WS Acc. Plan(K/L)</td>";
             EmailBody += "<td >Acc(PCS)</td><td >Acc(K/L)</td><td >Capacity</td><td >WIP</td><td >Capacity Ratio</td><td width='5%'>Diff</td><td >达成率</td><td width='5%'>Diff</td><td >达成率</td></tr>";
 
             //   數據編碼   針對潤興數據進行Show        

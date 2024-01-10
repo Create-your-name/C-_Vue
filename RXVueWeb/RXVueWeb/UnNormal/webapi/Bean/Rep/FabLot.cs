@@ -2,7 +2,7 @@
 
 namespace webapi.Bean.Rep
 {
-    public class FabLot 
+    public class FabLot
     {
         public record StageWipDate(
 
@@ -10,5 +10,12 @@ namespace webapi.Bean.Rep
              string? Product
 
          );
+
+        public record DateTimeInfo(
+
+           string? activityBeginTime,
+           string? activityEndTime
+          );
+
     }
 }

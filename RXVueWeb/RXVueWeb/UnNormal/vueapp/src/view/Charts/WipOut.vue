@@ -20,6 +20,48 @@
                 </div>
             </el-col>
         </el-row>
+        <el-table ref="filterTable"
+                  :id="Tid"
+                  :data="table"
+                  size="small"
+                  align="center"
+                  row-class-name="row"
+                  cell-class-name="column"
+                  :highlight-current-row="true"
+                  :header-cell-style="headerCellStyle"
+                  :row-style="rowStyle"
+                  :cell-style="cellStyle"
+                  @cell-click="clickRow"
+                  @row-click="test"
+                  @row-dblclick="rowdblclick"
+                  @selection-change="SelectChange"
+                  height="600"
+                  style="width: 100% ;overflow: hidden"
+                  v-loading="tableLoading"
+                  :fit="true"
+                  :stripe="false"
+                  element-loading-text="加载中"
+                  v-scroller
+                  v-horizontal-scroll>
+            <template v-for=" item in tableLabel">
+                <el-table-column v-if="item.show"
+                                 :key="item.prop"
+                                 :show-overflow-tooltip="true"
+                                 sortable
+                                 :prop="item.prop"
+                                 :width="item.width"
+                                 :label="item.label" />
+                <el-table-column v-if="item.HoldNumber"
+                                 :label="item.label"
+                                 :prop="item.prop"
+                                 :key="item.prop"
+                                 :width="item.width">
+                    <template #default="scope">
+                        <el-link @click="handleLinkClick(scope.row.dept)" target="_blank" class="font-microsoft" :underline="false">{{scope.row[item.prop]}}</el-link>
+                    </template>
+                </el-table-column>
+            </template>
+        </el-table>
     </div>
 </template>
 <script>
@@ -100,7 +142,7 @@
                         },
                     },
                     {
-                        text:  'ACC Act: ' +( (ydata[24][0]-2)>=0?ydata[13][ydata[24][0] - 1]:0) + ' pcs' + '\n' + 'ACC target: ' + (ydata[16][ydata[24][0] - 1]) + ' pcs'  ,
+                        text:  'ACC Act: ' +( (ydata[24][0]-2)>=0?ydata[13][ydata[24][0] - 1] :0   ) + ' pcs' + '\n' + 'ACC target: ' + (ydata[16][ydata[24][0] - 1]) + ' pcs'  ,
                         left: "1450px",
                         top: "20px",
                         textStyle: {
@@ -245,13 +287,26 @@
                             itemStyle: {
                                 normal: { color: 'rgba(145, 182, 227)', },
                             },
+                            emphasis: {
+                                focus: 'series',
+                            },
+                            data: ydata[12],
+                        },
+                        {
+                            name: xdata[27],
+                            type: 'bar',
+                            stack: '总量',
+                            barWidth: '75%',
+                            itemStyle: {
+                                normal: { color: 'rgba(255,165,0)', },
+                            },
                             label: {
                                 normal: {
                                     show: true,
                                     position: 'top',
                                     formatter: function (params) {
 
-                                        var value = params.value + ydata[10][params.dataIndex] + ydata[11][params.dataIndex];
+                                        var value = params.value + ydata[10][params.dataIndex] + ydata[11][params.dataIndex] + ydata[12][params.dataIndex] ;
                                         if (value != 0) {
                                             return value.toFixed(2);
                                         } else {
@@ -268,7 +323,7 @@
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: ydata[12],
+                            data: ydata[27],
 
                         },
                         {
@@ -369,18 +424,18 @@
                         },
                     },
                     {
-                        text: (ydata[20][ydata[20].length -1] + 40 - 6000 ) + ' pcs' + '\n',
+                        text: (ydata[20][ydata[20].length -1]  - 146 ) + ' pcs' + '\n',
                         left: "550px", 
                                                 top: "30px",
                         textStyle: {
                             fontFamily: 'Microsoft YaHei',
                             fontWeight: 'bold',
                             fontSize: 25,
-                            color: ((ydata[20][ydata[20].length-1] + 40 - 6000)) < 0 ? 'red' : 'balck'
+                            color: ((ydata[20][ydata[20].length-1] - 146)) < 0 ? 'red' : 'balck'
                         },
                     },
                     {
-                        text:  'ACC Act: ' + ( ydata[20][ydata[20].length-1] + 40 )   + ' pcs' + '\n' + 'ACC target: 6000  pcs',
+                        text:  'ACC Act: ' + ( ydata[20][ydata[20].length-1]  )   + ' pcs' + '\n' + 'ACC target: 146  pcs',
                         left: "400px",
                         top: "60px",
                         textStyle: {
@@ -517,9 +572,23 @@
                             name: xdata[19],
                             type: 'bar',
                             stack: 'email',
-                             barWidth: '75%',
+                            barWidth: '75%',
                             itemStyle: { // 自定义柱子颜色
                                 normal: { color: 'rgba(145, 182, 227)', },
+                            },
+
+                            emphasis: {
+                                focus: 'series',
+                            },
+                            data: ydata[19],
+                        },
+                        {
+                            name: xdata[28],
+                            type: 'bar',
+                            stack: 'email',
+                             barWidth: '75%',
+                            itemStyle: { // 自定义柱子颜色
+                                normal: { color: 'rgba(255,165,0)', },
                             },
                             label: {
                                 normal: {
@@ -527,7 +596,7 @@
                                     position: 'top',
                                     formatter: function (params) {
                                         if (params.value + ydata[18][params.dataIndex] + ydata[17][params.dataIndex] != 0) {
-                                            return params.value + ydata[18][params.dataIndex] + ydata[17][params.dataIndex] 
+                                            return params.value + ydata[18][params.dataIndex] + ydata[17][params.dataIndex] + ydata[19][params.dataIndex]
                                         } else {
                                             return""
                                         }
@@ -542,11 +611,11 @@
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: ydata[19],
+                            data: ydata[28],
                         },
                         {
                             name: 'target',
-                            data: ['','' ,'','' ,'' ,'' ,'' , 159, 827,	2327,3803,6003 ],
+                            data: [146, '', '', '', '', '', '', '', '', '', '', '' ],
                             yAxisIndex: 1,
                             type: 'line',
                             symbol: 'circle',
@@ -563,7 +632,7 @@
                         },
                         {
                             name: 'act',
-                            data: ['', '', '', '', '', '', '', 159, 497, 1503, ydata[20][ydata[20].length - 1]+40 ],
+                            data: [ydata[20][ydata[20].length - 1], '', '', '', '', '', '', '', '', '', '','' ],
                             type: 'line',
                             yAxisIndex: 1,
                             smooth: false,

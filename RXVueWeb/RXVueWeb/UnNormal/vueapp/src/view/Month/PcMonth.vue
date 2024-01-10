@@ -214,8 +214,8 @@
              SPLLOT() {
                 const confirmInput = prompt('请输入密码');
                     if (confirmInput === 'sxx') {
-                   // axios.post("http://10.163.76.23/api/api/PcMonth/SPLLOT", this.SPLLOTDATE)
-                      axios.post("https://localhost:7155/api/PcMonth/SPLLOT", this.SPLLOTDATE)
+                    axios.post("http://10.163.76.23/api/api/PcMonth/SPLLOT", this.SPLLOTDATE)
+                   //   axios.post("https://localhost:7155/api/PcMonth/SPLLOT", this.SPLLOTDATE)
                             .then((res) => {
                                 this.formData = res.data;
                                 this.total = res.data.length;
@@ -227,8 +227,8 @@
             LT() {
                 const confirmInput = prompt('请输入密码');
                 if (confirmInput === 'lt') {
-                    //    axios.post("http://10.163.76.23/api/api/PcMonth/LT", this.lt)
-                        axios.post("https://localhost:7155/api/PcMonth/LT", this.lt)
+                        axios.post("http://10.163.76.23/api/api/PcMonth/LT", this.lt)
+                    //    axios.post("https://localhost:7155/api/PcMonth/LT", this.lt)
                         .then((res) => {
                             this.formData = res.data;
                             this.total = res.data.length;

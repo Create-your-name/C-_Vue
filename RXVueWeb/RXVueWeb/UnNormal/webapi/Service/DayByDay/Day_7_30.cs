@@ -1,6 +1,7 @@
 ﻿using System;
 using webapi.Service.CMP_SPTS_Email;
 using webapi.Service.DynCTSummary_Email;
+using webapi.Service.Email.OEE_Email;
 using webapi.Service.Email.WaferStart_Email;
 
 namespace webapi.Service.DayByDay
@@ -25,6 +26,8 @@ namespace webapi.Service.DayByDay
             ct2.SendCmpEmail();
             WaferStart_Email waferStart = new WaferStart_Email();
             waferStart.SendWaferStartEmail();
+            OEEEmail oee = new OEEEmail();
+            oee.SendOEEEmail();
             Console.WriteLine("邮件发送完毕");
 
         }

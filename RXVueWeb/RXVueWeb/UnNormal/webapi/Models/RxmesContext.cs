@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using webapi.Entity.Rxmes;
+using webapi.Model;
 
 namespace webapi.Models;
 
@@ -19,6 +20,8 @@ public partial class RxmesContext : DbContext
     public virtual DbSet<CustProductSetting> CustProductSettings { get; set; }
     public virtual DbSet<Fwwiptransaction> Fwwiptransactions { get; set; }
     public virtual DbSet<Fwlot> Fwlots { get; set; }
+
+    public virtual DbSet<Fwuserprofile> Fwuserprofiles { get; set; }
     public virtual DbSet<CustEqpSptDatum> CustEqpSptData { get; set; }
     public virtual DbSet<FwProcessSpec> FwProcessSpecs { get; set; }
     public virtual DbSet<Fwproductversion> Fwproductversions { get; set; }
@@ -31,6 +34,148 @@ public partial class RxmesContext : DbContext
         modelBuilder
             .HasDefaultSchema("RXMES")
             .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<Fwuserprofile>(entity =>
+        {
+            entity.HasKey(e => e.Sysid).HasName("SYS_C006501");
+
+            entity.ToTable("FWUSERPROFILE");
+
+            entity.HasIndex(e => e.Username, "SYS_C006502").IsUnique();
+
+            entity.HasIndex(e => e.Dbusername, "SYS_C006503").IsUnique();
+
+            entity.Property(e => e.Sysid)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("SYSID");
+            entity.Property(e => e.Activationdate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ACTIVATIONDATE");
+            entity.Property(e => e.Agingperiod)
+                .HasColumnType("NUMBER(38)")
+                .HasColumnName("AGINGPERIOD");
+            entity.Property(e => e.Allowlogindatetime)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("ALLOWLOGINDATETIME");
+            entity.Property(e => e.Currenthistory)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("CURRENTHISTORY");
+            entity.Property(e => e.Dbusername)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("DBUSERNAME");
+            entity.Property(e => e.Deletepartitionids)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("DELETEPARTITIONIDS");
+            entity.Property(e => e.Expirationdate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("EXPIRATIONDATE");
+            entity.Property(e => e.Extendedproperties)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("EXTENDEDPROPERTIES");
+            entity.Property(e => e.Failedretrycount)
+                .HasColumnType("NUMBER(38)")
+                .HasColumnName("FAILEDRETRYCOUNT");
+            entity.Property(e => e.Fwtimestamp)
+                .HasPrecision(10)
+                .HasColumnName("FWTIMESTAMP");
+            entity.Property(e => e.Historyhasbeensuppressed)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("HISTORYHASBEENSUPPRESSED");
+            entity.Property(e => e.Historyissuppressed)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("HISTORYISSUPPRESSED");
+            entity.Property(e => e.Insertpartitionids)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("INSERTPARTITIONIDS");
+            entity.Property(e => e.Lastlogindatetime)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LASTLOGINDATETIME");
+            entity.Property(e => e.Lastpassword)
+                .HasMaxLength(1024)
+                .IsUnicode(false)
+                .HasColumnName("LASTPASSWORD");
+            entity.Property(e => e.Lastpasswordchange)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LASTPASSWORDCHANGE");
+            entity.Property(e => e.Lastupdateuser)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LASTUPDATEUSER");
+            entity.Property(e => e.Modifieddatetime)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("MODIFIEDDATETIME");
+            entity.Property(e => e.Nickname)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("NICKNAME");
+            entity.Property(e => e.Password)
+                .HasMaxLength(64)
+                .IsUnicode(false)
+                .HasColumnName("PASSWORD");
+            entity.Property(e => e.Resourcecategory)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("RESOURCECATEGORY");
+            entity.Property(e => e.Selectpartitionids)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("SELECTPARTITIONIDS");
+            entity.Property(e => e.Shop)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("SHOP");
+            entity.Property(e => e.Startequipment)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("STARTEQUIPMENT");
+            entity.Property(e => e.Updatepartitionids)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("UPDATEPARTITIONIDS");
+            entity.Property(e => e.Usergroup)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("USERGROUP");
+            entity.Property(e => e.Username)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("USERNAME");
+            entity.Property(e => e.Vendor)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("VENDOR");
+            entity.Property(e => e.Woclockonlimit)
+                .HasColumnType("NUMBER(38)")
+                .HasColumnName("WOCLOCKONLIMIT");
+        });
+        modelBuilder.HasSequence("CORESEQUENCE");
+        modelBuilder.HasSequence("EQPSEQUENCE");
+        modelBuilder.HasSequence("NEWCORESEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("NEWEQPSEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("PARTITIONSEQUENCE");
+        modelBuilder.HasSequence("WIPSEQUENCE").IsCyclic();
 
         modelBuilder.Entity<CustProductSetting>(entity =>
         {

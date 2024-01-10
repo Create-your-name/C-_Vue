@@ -17,7 +17,8 @@ public partial class RxrepContext : DbContext
 
     public virtual DbSet<WtDynamicctreport> WtDynamicctreports { get; set; }
     public virtual DbSet<VMfgHoldLastest> VMfgHoldLastests { get; set; }
-
+    public virtual DbSet<RptScrap> RptScraps { get; set; }
+    public virtual DbSet<VOeeSumV2011> VOeeSumV2011s { get; set; }
     public virtual DbSet<CostScrap0> CostScrap0s { get; set; }
     public virtual DbSet<RepEqpsStartEnd> RepEqpsStartEnds { get; set; }
     public virtual DbSet<RptWaferStart> RptWaferStarts { get; set; }
@@ -34,6 +35,346 @@ public partial class RxrepContext : DbContext
             .HasDefaultSchema("RXREP")
             .UseCollation("USING_NLS_COMP");
 
+        modelBuilder.Entity<RptScrap>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("RPT_SCRAP");
+
+            entity.HasIndex(e => new { e.Wipid, e.Process, e.Processver, e.Stepseq }, "I_RPT_SCRAP_1");
+
+            entity.HasIndex(e => e.Scrapsysid, "I_RPT_SCRAP_3");
+
+            entity.HasIndex(e => new { e.Wipid, e.Scrapdate }, "PK_RPT_SCRAP").IsUnique();
+
+            entity.Property(e => e.AbnormDept1)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("ABNORM_DEPT1");
+            entity.Property(e => e.AbnormDept2)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("ABNORM_DEPT2");
+            entity.Property(e => e.AbnormReason)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("ABNORM_REASON");
+            entity.Property(e => e.AbnormScarp2)
+                .HasColumnType("NUMBER")
+                .HasColumnName("ABNORM_SCARP2");
+            entity.Property(e => e.AbnormScrap1)
+                .HasColumnType("NUMBER")
+                .HasColumnName("ABNORM_SCRAP1");
+            entity.Property(e => e.Abnormcard)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("ABNORMCARD");
+            entity.Property(e => e.Briefdescription)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("BRIEFDESCRIPTION");
+            entity.Property(e => e.Cause1)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("CAUSE1");
+            entity.Property(e => e.Cause2)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("CAUSE2");
+            entity.Property(e => e.Commentcode)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("COMMENTCODE");
+            entity.Property(e => e.Detaileddescription)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("DETAILEDDESCRIPTION");
+            entity.Property(e => e.Engabnormequip)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("ENGABNORMEQUIP");
+            entity.Property(e => e.Enganalyze)
+                .HasMaxLength(600)
+                .IsUnicode(false)
+                .HasColumnName("ENGANALYZE");
+            entity.Property(e => e.Engdescription)
+                .HasMaxLength(600)
+                .IsUnicode(false)
+                .HasColumnName("ENGDESCRIPTION");
+            entity.Property(e => e.Equipname)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("EQUIPNAME");
+            entity.Property(e => e.Flowstep)
+                .HasColumnType("NUMBER")
+                .HasColumnName("FLOWSTEP");
+            entity.Property(e => e.Lotcomment)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("LOTCOMMENT");
+            entity.Property(e => e.Lotowner)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("LOTOWNER");
+            entity.Property(e => e.Lotquantity)
+                .HasColumnType("NUMBER")
+                .HasColumnName("LOTQUANTITY");
+            entity.Property(e => e.Lott)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("LOTT");
+            entity.Property(e => e.Lottype)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LOTTYPE");
+            entity.Property(e => e.Maxflowstep)
+                .HasColumnType("NUMBER")
+                .HasColumnName("MAXFLOWSTEP");
+            entity.Property(e => e.Occursinstep)
+                .HasMaxLength(51)
+                .IsUnicode(false)
+                .HasColumnName("OCCURSINSTEP");
+            entity.Property(e => e.Pcmflag)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("PCMFLAG");
+            entity.Property(e => e.Pday)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .HasColumnName("PDAY");
+            entity.Property(e => e.Photosort)
+                .HasColumnType("NUMBER")
+                .HasColumnName("PHOTOSORT");
+            entity.Property(e => e.Platform)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("PLATFORM");
+            entity.Property(e => e.Process)
+                .HasMaxLength(102)
+                .IsUnicode(false)
+                .HasColumnName("PROCESS");
+            entity.Property(e => e.Processflag)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PROCESSFLAG");
+            entity.Property(e => e.Processtype)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSTYPE");
+            entity.Property(e => e.Processver)
+                .HasMaxLength(102)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSVER");
+            entity.Property(e => e.Productname)
+                .HasMaxLength(102)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCTNAME");
+            entity.Property(e => e.Prodver)
+                .HasMaxLength(102)
+                .IsUnicode(false)
+                .HasColumnName("PRODVER");
+            entity.Property(e => e.Pstatus)
+                .HasMaxLength(1)
+                .IsUnicode(false)
+                .HasDefaultValueSql("'N'")
+                .IsFixedLength()
+                .HasColumnName("PSTATUS");
+            entity.Property(e => e.ScrapReason)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("SCRAP_REASON");
+            entity.Property(e => e.ScrapWaferno)
+                .HasMaxLength(250)
+                .IsUnicode(false)
+                .HasColumnName("SCRAP_WAFERNO");
+            entity.Property(e => e.Scrapdate)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("SCRAPDATE");
+            entity.Property(e => e.Scrapqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("SCRAPQTY");
+            entity.Property(e => e.Scrapqty1)
+                .HasColumnType("NUMBER")
+                .HasColumnName("SCRAPQTY1");
+            entity.Property(e => e.Scrapsysid)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("SCRAPSYSID");
+            entity.Property(e => e.Scraptype)
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .HasColumnName("SCRAPTYPE");
+            entity.Property(e => e.Stage)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("STAGE");
+            entity.Property(e => e.Stepseq)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("STEPSEQ");
+            entity.Property(e => e.Ttphotos)
+                .HasColumnType("NUMBER")
+                .HasColumnName("TTPHOTOS");
+            entity.Property(e => e.Userid)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("USERID");
+            entity.Property(e => e.Username)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("USERNAME");
+            entity.Property(e => e.Wipid)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("WIPID");
+            entity.Property(e => e.Wono)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("WONO");
+        });
+        modelBuilder.HasSequence("ACTIONSTUDYNO");
+        modelBuilder.HasSequence("CPT_SEQ");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_SHIPTONO");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_TONO");
+        modelBuilder.HasSequence("DEPT_ONDUTYNO");
+        modelBuilder.HasSequence("DEV_MESSAGE_NO");
+        modelBuilder.HasSequence("DEVELOP_EQUIP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_EQUIPJOBNO");
+        modelBuilder.HasSequence("DEVELOP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_SYS_NO");
+        modelBuilder.HasSequence("HEF_PRODUCT_INFO_ID");
+        modelBuilder.HasSequence("HFE_LOT_INFO_ID");
+        modelBuilder.HasSequence("IFAB_PURVIEWNO");
+        modelBuilder.HasSequence("IFAB_UPLOADNO");
+        modelBuilder.HasSequence("IFAB_USERNO");
+        modelBuilder.HasSequence("IT_WORKPLANNO");
+        modelBuilder.HasSequence("MODULE_STEPCODENO");
+        modelBuilder.HasSequence("OEE_CAPAGROUP_SNO");
+        modelBuilder.HasSequence("PMS_USER_NO");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_ID");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_MA_ID");
+
+        modelBuilder.Entity<VOeeSumV2011>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("V_OEE_SUM_V2011");
+
+            entity.Property(e => e.Attr1)
+                .HasColumnType("NUMBER")
+                .HasColumnName("ATTR1");
+            entity.Property(e => e.Avai)
+                .HasColumnType("NUMBER")
+                .HasColumnName("AVAI");
+            entity.Property(e => e.Batchcapacity)
+                .HasColumnType("NUMBER")
+                .HasColumnName("BATCHCAPACITY");
+            entity.Property(e => e.Batchqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("BATCHQTY");
+            entity.Property(e => e.Capagroup)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("CAPAGROUP");
+            entity.Property(e => e.Downcnt)
+                .HasColumnType("NUMBER")
+                .HasColumnName("DOWNCNT");
+            entity.Property(e => e.DowncntS1)
+                .HasColumnType("NUMBER")
+                .HasColumnName("DOWNCNT_S1");
+            entity.Property(e => e.Eff)
+                .HasColumnType("NUMBER")
+                .HasColumnName("EFF");
+            entity.Property(e => e.Effrun)
+                .HasColumnType("NUMBER")
+                .HasColumnName("EFFRUN");
+            entity.Property(e => e.EqpAttr1)
+                .HasColumnType("NUMBER")
+                .HasColumnName("EQP_ATTR1");
+            entity.Property(e => e.EqpAttr2)
+                .HasColumnType("NUMBER")
+                .HasColumnName("EQP_ATTR2");
+            entity.Property(e => e.Eqptype)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("EQPTYPE");
+            entity.Property(e => e.EqptypeDesc)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("EQPTYPE_DESC");
+            entity.Property(e => e.Equipid)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("EQUIPID");
+            entity.Property(e => e.Facdown)
+                .HasColumnType("NUMBER")
+                .HasColumnName("FACDOWN");
+            entity.Property(e => e.Inqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("INQTY");
+            entity.Property(e => e.Module)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("MODULE");
+            entity.Property(e => e.Otherloss)
+                .HasColumnType("NUMBER")
+                .HasColumnName("OTHERLOSS");
+            entity.Property(e => e.PUph)
+                .HasColumnType("NUMBER")
+                .HasColumnName("P_UPH");
+            entity.Property(e => e.Pday)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("PDAY");
+            entity.Property(e => e.Qaqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("QAQTY");
+            entity.Property(e => e.Run01)
+                .HasColumnType("NUMBER")
+                .HasColumnName("RUN_01");
+            entity.Property(e => e.S1).HasColumnType("NUMBER");
+            entity.Property(e => e.S2).HasColumnType("NUMBER");
+            entity.Property(e => e.S3).HasColumnType("NUMBER");
+            entity.Property(e => e.S4).HasColumnType("NUMBER");
+            entity.Property(e => e.S5).HasColumnType("NUMBER");
+            entity.Property(e => e.S6).HasColumnType("NUMBER");
+            entity.Property(e => e.Sptsum)
+                .HasColumnType("NUMBER")
+                .HasColumnName("SPTSUM");
+            entity.Property(e => e.Tt)
+                .HasColumnType("NUMBER")
+                .HasColumnName("TT");
+            entity.Property(e => e.Ttime)
+                .HasColumnType("NUMBER")
+                .HasColumnName("TTIME");
+            entity.Property(e => e.Uptime)
+                .HasColumnType("NUMBER")
+                .HasColumnName("UPTIME");
+        });
+        modelBuilder.HasSequence("ACTIONSTUDYNO");
+        modelBuilder.HasSequence("CPT_SEQ");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_SHIPTONO");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_TONO");
+        modelBuilder.HasSequence("DEPT_ONDUTYNO");
+        modelBuilder.HasSequence("DEV_MESSAGE_NO");
+        modelBuilder.HasSequence("DEVELOP_EQUIP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_EQUIPJOBNO");
+        modelBuilder.HasSequence("DEVELOP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_SYS_NO");
+        modelBuilder.HasSequence("HEF_PRODUCT_INFO_ID");
+        modelBuilder.HasSequence("HFE_LOT_INFO_ID");
+        modelBuilder.HasSequence("IFAB_PURVIEWNO");
+        modelBuilder.HasSequence("IFAB_UPLOADNO");
+        modelBuilder.HasSequence("IFAB_USERNO");
+        modelBuilder.HasSequence("IT_WORKPLANNO");
+        modelBuilder.HasSequence("MODULE_STEPCODENO");
+        modelBuilder.HasSequence("OEE_CAPAGROUP_SNO");
+        modelBuilder.HasSequence("PMS_USER_NO");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_ID");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_MA_ID");
 
         modelBuilder.Entity<CostScrap0>(entity =>
         {

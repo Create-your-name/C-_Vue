@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="src\css\" />
     <Folder Include="src\view\Charts\Plan\" />
-    <Folder Include="src\view\Table\" />
     <Folder Include="src\view\Month\" />
   </ItemGroup>
 </Project>

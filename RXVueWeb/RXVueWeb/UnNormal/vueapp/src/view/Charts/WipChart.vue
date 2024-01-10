@@ -96,7 +96,7 @@
                         },
                         {
                             //text: (((today - 2) >= 0 ? ydata[3][today - 2] : 0) - (ydata[6][ydata[6].length - 1])) + ' pcs \n',
-                        text: (((((today - 2) >= 0 ? ydata[3][ydata[3].length - 1] : 0) + 3512 ) - 6402 )) + ' pcs \n',
+                        text: (((((today - 2) >= 0 ? ydata[3][ydata[3].length - 1] : 0) ) - 442 )) + ' pcs \n',
                             left: "550px",
                              top: "20px",
                             textStyle: {
@@ -104,12 +104,12 @@
                                 fontWeight: 'bold',
                                 fontSize: 27,
                                 //color: (((today - 2) >= 0 ? ydata[3][today - 2] : 0) - (ydata[6][ydata[6].length - 1])) < 0 ? 'red' : 'balck',
-                            color: (((((today - 2) >= 0 ? ydata[3][ydata[3].length - 1] : 0) + 3512 )- 6402 ))<0 ? 'red' : 'balck',
+                            color: (((((today - 2) >= 0 ? ydata[3][ydata[3].length - 1] : 0) )- 442 ))<0 ? 'red' : 'balck',
                             },
                         },
                         {
                            // text: 'ACC Act: ' + ((today - 2) >= 0 ? ydata[3][today - 2] : 0) + ' pcs' + '\n' + 'ACC target:' + (ydata[6][ydata[6].length - 1]) + ' pcs',
-                        text: 'ACC Act: ' + (((today - 2) >= 0 ? ydata[3][today - 2] : 0) + 3512 )+ ' pcs' + '\n' + 'ACC target: 6402 pcs' ,
+                        text: 'ACC Act: ' + (((today - 2) >= 0 ? ydata[3][today - 1] : 0)  )+ ' pcs' + '\n' + 'ACC target: 442 pcs' ,
                             left: "400px",
                             top: "50px",
                             textStyle: {
@@ -244,20 +244,34 @@
                                 },
                                 data: ydata[8],
                             },
+                        {
+                            name: xdata[9],
+                            type: 'bar',
+                            stack: 'email',
+                            barWidth: '75%',
+                            itemStyle: { // 自定义柱子颜色
+                                normal: { color: 'rgba(145, 182, 227)', },
+                            },
+
+                            emphasis: {
+                                focus: 'series',
+                            },
+                            data: ydata[9],
+                        },
                             {
-                                name: xdata[9],
+                                name: xdata[26],
                                 type: 'bar',
                                 stack: 'email',
                                 barWidth: '75%',
                                 itemStyle: { // 自定义柱子颜色
-                                    normal: { color: 'rgba(145, 182, 227)', },
+                                  normal: { color: 'rgba(255,165,0)', },
                                 },
                                 label: {
                                     normal: {
                                         show: true,
                                         position: 'top',
                                         formatter: function (params) {
-                                            return params.value + ydata[8][params.dataIndex] + ydata[7][params.dataIndex]
+                                        return params.value + ydata[8][params.dataIndex] + ydata[7][params.dataIndex] + ydata[9][params.dataIndex]
                                         },
                                         textStyle: {
                                             color: '#000',
@@ -269,11 +283,11 @@
                                 emphasis: {
                                     focus: 'series',
                                 },
-                                data: ydata[9],
+                                data: ydata[26],
                             },
                             {
                                 name: 'target',
-                                data: ['', '', '', '', '', '', '', 1016, 3302, 5902, 6402, 6402],
+                                data: ['', '', '', '', '', '', '', '', '', '', '', ''],
                                 yAxisIndex: 1,
                                 type: 'line',
                                 symbol: 'circle',
@@ -290,7 +304,7 @@
                             },
                             {
                                 name: 'act',
-                            data: ['', '', '', '', '', '', '', 1138,2612,3512,3512 + ydata[3][ydata[3].length - 1]],
+                            data: ['', '', '', '', '', '', '', '','','','',''],
                                 type: 'line',
                                 yAxisIndex: 1,
                                 smooth: false,
@@ -327,7 +341,7 @@
                             },
                         },
                         {
-                            text: (((ydata[24][0] - 2) >= 0 ? ydata[3][ydata[24][0] - 2] : 0) - ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0)) + ' pcs \n',
+                            text: (((ydata[24][0] - 1) >= 0 ? ydata[3][ydata[24][0] - 1] : 0) - ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0)) + ' pcs \n',
                             //假   text: ((ydata[24][0]-2)>=0? (ydata[3][ydata[24][0] - 1] - 1124 ):0) + '\n',
                             left: "1650px",
                             top: "30px",
@@ -335,12 +349,12 @@
                                 fontFamily: 'Microsoft YaHei',
                                 fontWeight: 'bold',
                                 fontSize: 27,
-                                color: ((((ydata[24][0] - 2) >= 0 ? ydata[3][ydata[24][0] - 2] : 0) - ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0))) < 0 ? 'red' : 'balck'
+                                color: ((((ydata[24][0] - 1) >= 0 ? ydata[3][ydata[24][0] - 1] : 0) - ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0))) < 0 ? 'red' : 'balck'
                                 //     color: (((ydata[24][0]-2)>=0?(ydata[3][ydata[24][0] - 1] - 1124 ):0)) <0 ?'red':'balck'
                             },
                         },
                         {
-                            text: 'ACC Act: ' + ((ydata[24][0] - 2) >= 0 ? ydata[3][ydata[24][0] - 2] : '0') + 'pcs\n' + 'ACC target: ' + ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0) + 'pcs',
+                            text: 'ACC Act: ' + ((ydata[24][0] - 1) >= 0 ? ydata[3][ydata[24][0] - 1] : '0') + 'pcs\n' + 'ACC target: ' + ((ydata[24][0] - 2) >= 0 ? ydata[6][ydata[24][0] - 2] : 0) + 'pcs',
                             // 假   text: 'ACC Act: ' + ((ydata[24][0]-2)>=0?ydata[3][ydata[24][0] - 1]:'0')+ 'pcs \n' + 'ACC target: 1124 pcs',
                             left: "1500px",
                             top: "50px",
@@ -480,12 +494,25 @@
                             itemStyle: {
                                 normal: { color: 'rgba(145, 182, 227)', },
                             },
+                            emphasis: {
+                                focus: 'series',
+                            },
+                            data: ydata[2],
+                        },
+                        {
+                            name: xdata[25],
+                            type: 'bar',
+                            stack: '总量',
+                            barWidth: '75%',
+                            itemStyle: {
+                                normal: { color: 'rgba(255,165,0)', },
+                            },
                             label: {
                                 normal: {
                                     show: true,
                                     position: 'top',
                                     formatter: function (params) {
-                                        var value = params.value + ydata[1][params.dataIndex] + ydata[0][params.dataIndex];
+                                        var value = params.value + ydata[1][params.dataIndex] + ydata[0][params.dataIndex] + ydata[2][params.dataIndex];
                                         if (value != 0) {
                                             return value.toFixed(2);
                                         } else {
@@ -501,7 +528,7 @@
                             emphasis: {
                                 focus: 'series',
                             },
-                            data: ydata[2],
+                            data: ydata[25],
 
                         },
                             {

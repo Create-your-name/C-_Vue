@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.Formula.Functions;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,6 +11,7 @@ using webapi.Bean.Chart;
 using webapi.Entity;
 using webapi.Entity.Api;
 using webapi.Models;
+using webapi.Service.Chart;
 using webapi.Util;
 using static webapi.Bean.FormData;
 
@@ -30,6 +32,8 @@ namespace webapi.Controllers.Charts
                var NdProduct = ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) = 'ND'").Select(e => e.Product)
                    .ToList();
                var MeiProduct = ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) = 'MM'").Select(e => e.Product)
+                   .ToList();
+                var QtProduct = ctx.CustProductSettings.FromSqlInterpolated($@"select *  from  cust_product_setting A  WHERE Substr(PRODUCT, 3, 2) != 'MM' and Substr(PRODUCT, 3, 2) != 'ND' and  Substr(PRODUCT, 3, 2) != 'GS'").Select(e => e.Product)
                    .ToList();
                 using (Rxrept2Context ctx3 =new Rxrept2Context()) { 
                 using (RxrepContext ctx2 = new RxrepContext()) {
@@ -63,14 +67,20 @@ namespace webapi.Controllers.Charts
                     var NdNumber = NdProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
                     var MeiNumber = MeiProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
 
-                    var GsONumber = GsProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product}")).ToList();
-                    var NdONumber = NdProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product}")).ToList();
-                    var MeiONumber = MeiProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product}")).ToList();
+                    var GsONumber = GsProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product} and priority !=4000")).ToList();
+                    var NdONumber = NdProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product} and priority !=4000")).ToList();
+                    var MeiONumber = MeiProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product} and priority !=4000")).ToList();
 
-                    var GsHNumber = GsProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product} AND  AREA='QA'  AND HOLDREASON='HRMM11'")).ToList();
-                    var NdHNumber = NdProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product} AND  AREA='QA'  AND HOLDREASON='HRMM11'")).ToList();
-                    var MeiHNumber = MeiProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product}  AND  AREA='QA'  AND HOLDREASON='HRMM11' ")).ToList();
 
+                     //   1 / 8
+
+                     var QtNumber = QtProduct.SelectMany(product => ctx2.RptWaferStarts.FromSqlInterpolated($@"select * from rpt_wafer_start where PRODUCTNAME = {product}")).ToList();
+                     var QtONumber = QtProduct.SelectMany(product => ctx2.RptLotFinishes.FromSqlInterpolated($@"select * from RPT_LOT_FINISH where PRODUCTNAME = {product} and priority !=4000")).ToList();
+
+                        /*    var GsHNumber = GsProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product} AND  AREA='QA'  AND HOLDREASON='HRMM11'")).ToList();
+                            var NdHNumber = NdProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product} AND  AREA='QA'  AND HOLDREASON='HRMM11'")).ToList();
+                            var MeiHNumber = MeiProduct.SelectMany(product => ctx2.VMfgHoldLastests.FromSqlInterpolated($@"select * from v_mfg_hold_lastest where PRODUCTNAME = {product}  AND  AREA='QA'  AND HOLDREASON='HRMM11' ")).ToList();
+        */
 
                         // 每月计算   投入
                         var GsData = daysInMonth.Select(day =>
@@ -110,8 +120,9 @@ namespace webapi.Controllers.Charts
                         var meiNumber = MeiNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
                         var ndNumber = NdNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
                         var gsNumber = GsNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                        var qtNumber = QtNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
 
-                        sum += Convert.ToInt32(meiNumber) + Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber) ;
+                        sum += Convert.ToInt32(meiNumber) + Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber) + Convert.ToInt32(qtNumber);
                         return new
                         {
 
@@ -186,12 +197,12 @@ namespace webapi.Controllers.Charts
 
                     //一个月维护一次
                     string title5 = "动态目标";
-                        double[] number5 = { 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93 };
+                        double[] number5 = { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,15 };
                     ChartFrom chart4 = new ChartFrom(title5, number5);
                     result.Add(chart4);
 
                     string title6 = "MP目标";
-                        double[] number6 = { 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93, 93 };
+                        double[] number6 = { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,15 };
                     ChartFrom chart5 = new ChartFrom(title6, number6);
                     result.Add(chart5);
 
@@ -211,67 +222,43 @@ namespace webapi.Controllers.Charts
                         // 每月计算  o->Out
                         var GsoData = daysInMonth.Select(day =>
                         {
-                            var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                         //   var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
                             var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
-
-                            if (day.Date.ToString("yyyy/MM/dd") =="2023/10/02" ) {
-                                 gsHNumber = 0;
-                                 gsNumber = 0;
-                            }
                             return new
                             {
-                                GsNumber = gsNumber + gsHNumber,
+                             //   GsNumber = gsNumber + gsHNumber,
+                                GsNumber = gsNumber
                             };
                         }).ToList();
 
                         var NdoData = daysInMonth.Select(day =>
                         {
-                            var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                       //     var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
                             var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy /MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/10/02")
-                            {
-                                ndHNumber = 0;
-                                ndNumber = 0;
-                            }
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/11/04")
-                            {
-                                ndHNumber = 0;
-                                ndNumber = 0;
-                            }
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/11/02")
-                            {
-                                ndHNumber = 0;
-                                ndNumber = 0;
-                            }
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/11/06")
-                            {
-                                ndHNumber = 2;
-                                ndNumber = 0;
-                            }
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/11/07")
-                            {
-                                ndHNumber = 48;
-                                ndNumber = 0;
-                            }
+
 
                             return new
                             {
-                                NdNumber = ndNumber + ndHNumber,
+                                //   NdNumber = ndNumber + ndHNumber,
+                                NdNumber = ndNumber
                             };
                         }).ToList();
 
                         var MeioData = daysInMonth.Select(day =>
                         {
-                            var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                        //    var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
                             var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
-                            if (day.Date.ToString("yyyy/MM/dd") == "2023/10/02")
+                        
+
+                            /*                    if (day.Date.ToString("yyyy/MM/dd") == "2023/10/02")
                             {
-                                meiHNumber = 0;
+                            //    meiHNumber = 0;
                                 meiNumber = 0;
-                            }
+                            }*/
                             return new
                             {
-                                MeiNumber = meiNumber + meiHNumber,
+                          //      MeiNumber = meiNumber + meiHNumber,
+                                MeiNumber = meiNumber
                             };
                         }).ToList();
 
@@ -331,71 +318,57 @@ namespace webapi.Controllers.Charts
 
                         var GsMonthAve = monthsInYear.Select(month =>
                         {
-                            var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
+                       //     var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                            var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+/*                            if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
                             {
-                                gsHNumber += 28;
-                            }
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                            {
-                                gsHNumber -= 28;
-                            }
-                            
+                                //    meiHNumber = 0;
+                                gsNumber += 2;
+                            }*/
+   
+
                             var dayInMonth = DateTime.DaysInMonth(month.Date.Year, month.Date.Month);
                             return new
                             {
-                                GsMNumber = Math.Round((double)((gsNumber + gsHNumber) / dayInMonth), 2),
-                               
+                            //    GsMNumber = Math.Round((double)((gsNumber + gsHNumber) / dayInMonth), 2),
+                                GsMNumber = Math.Round((double)((gsNumber) / dayInMonth), 2),
+
+
                             };
                         }).ToList();
 
                         var NdMonthAve = monthsInYear.Select(month =>
                         {
-                            var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
-
-
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
+                      //      var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                            var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+       /*                     if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
                             {
-                                ndHNumber += 47;
-                            }
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                            {
-                                ndHNumber -= 47;
-                            }
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/11/01")
-                            {
-                                ndHNumber -= 196;
-                                ndHNumber -= 72;
-                                ndHNumber -= 8;
-                            }
+                                //    meiHNumber = 0;
+                                ndNumber += 75;
+                            }*/
                             var dayInMonth = DateTime.DaysInMonth(month.Date.Year, month.Date.Month);
                             return new
                             {
-                                NdNumber = Math.Round((double)(ndNumber + ndHNumber) / dayInMonth, 2),
+                         //       NdNumber = Math.Round((double)(ndNumber + ndHNumber) / dayInMonth, 2),
+                                NdNumber = Math.Round((double)(ndNumber ) / dayInMonth, 2),
                             };
                         }).ToList();
 
                         var MeiMonthAve = monthsInYear.Select(month =>
                         {
-                            var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
-
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
+                          //  var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                            var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+               /*             if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
                             {
-                                meiHNumber += 37;
-                            }
-                            if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                            {
-                                meiHNumber -= 37;
-                            }
-
+                                //    meiHNumber = 0;meiNumber
+                                meiNumber += 82;
+                            }*/
                             var dayInMonth = DateTime.DaysInMonth(month.Date.Year, month.Date.Month);
 
                             return new
                             {
-                                MeiNumber = Math.Round((double)(meiNumber + meiHNumber) / dayInMonth, 2),
+                             //   MeiNumber = Math.Round((double)(meiNumber + meiHNumber) / dayInMonth, 2),
+                                MeiNumber = Math.Round((double)(meiNumber ) / dayInMonth, 2),
                             };
                         }).ToList();
 
@@ -430,60 +403,18 @@ namespace webapi.Controllers.Charts
                     var sum2 = 0;
                     var AccActOData = daysInMonth.Select(day =>
                     {
-                        var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+               /*         var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
                         var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
                         var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-
+*/
                         var meiNumber2 = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
                         var ndNumber2 = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
                         var gsNumber2 = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
+                        var qtNumber = QtONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture).ToString("yyyy/MM/dd ")) == DateTime.Parse(day.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qaoutqty);
 
-                        if (day.Date.ToString("yyyy/MM/dd") == "2023/10/02")
-                        {
-                            gsHNumber = 0;
-                            gsNumber2 = 0;
-                            ndHNumber = 0;
-                            ndNumber2 = 0;
-                            meiHNumber = 0;
-                            meiNumber2 = 0;
-                        }
-                        if (day.Date.ToString("yyyy/MM/dd") == "2023/11/04")
-                        {
-                            gsHNumber = 0;
-                            gsNumber2 = 0;
-                            ndHNumber = 0;
-                            ndNumber2 = 0;
-                            meiHNumber = 0;
-                            meiNumber2 = 0;
-                        }
-                        if (day.Date.ToString("yyyy/MM/dd") == "2023/11/02")
-                        {
-                            gsHNumber = 0;
-                            gsNumber2 = 0;
-                            ndHNumber = 0;
-                            ndNumber2 = 0;
-                            meiHNumber = 0;
-                            meiNumber2 = 0;
-                        }
-                        if (day.Date.ToString("yyyy/MM/dd") == "2023/11/06")
-                        {
-                            gsHNumber = 0;
-                            gsNumber2 = 0;
-                            ndHNumber = 2;
-                            ndNumber2 = 0;
-                            meiHNumber = 0;
-                            meiNumber2 = 0;
-                        }
-                        if (day.Date.ToString("yyyy/MM/dd") == "2023/11/07")
-                        {
-                            gsHNumber = 0;
-                            gsNumber2 = 0;
-                            ndHNumber = 48;
-                            ndNumber2 = 0;
-                            meiHNumber = 0;
-                            meiNumber2 = 0;
-                        }
-                        sum2 += Convert.ToInt32(meiNumber2) + Convert.ToInt32(ndNumber2) + Convert.ToInt32(gsNumber2) + Convert.ToInt16(gsHNumber) + Convert.ToInt16(ndHNumber) + Convert.ToInt16(meiHNumber);
+                        //     sum2 += Convert.ToInt32(meiNumber2) + Convert.ToInt32(ndNumber2) + Convert.ToInt32(gsNumber2) + Convert.ToInt16(gsHNumber) + Convert.ToInt16(ndHNumber) + Convert.ToInt16(meiHNumber);
+                        sum2 += Convert.ToInt32(meiNumber2) + Convert.ToInt32(ndNumber2) + Convert.ToInt32(gsNumber2) + Convert.ToInt32(qtNumber);
+
                         return new
                         {
 
@@ -505,7 +436,7 @@ namespace webapi.Controllers.Charts
                     result.Add(CCC14);
 
                     string D = "MP目标";
-                        double[] DD = {77   ,77  , 77  , 77  , 77  , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77 , 77  ,77  ,77 , 77  ,77 ,77  ,77  ,77 ,77  ,77 };
+                        double[] DD = {5   ,5  , 5  , 5  , 5  , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5 , 5  ,5  ,5 , 5  ,5 ,5  ,5  ,5 ,5  ,5 ,5};
                     ChartFrom DDD15 = new ChartFrom(D, DD);
                     result.Add(DDD15);
 
@@ -526,74 +457,51 @@ namespace webapi.Controllers.Charts
 
                     var GsOMonth = monthsInYear.Select(month =>
                     {
-                        var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                        var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
-
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
+                  //      var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                        var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+ /*                       if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
                         {
-                            gsHNumber += 28;
-                        }
+                            //    meiHNumber = 0;
+                            gsNumber += 2 ;
+                        }*/
+
                         return new
                         {
-                            GsMNumber = gsNumber+gsHNumber,
+                            //     GsMNumber = gsNumber+gsHNumber,
+                            GsMNumber = gsNumber
                         };
                     }).ToList();
 
                     var NdOMonth = monthsInYear.Select(month =>
                     {
-                        var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                        var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
+                    //    var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                        var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+              /*          if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
+                        {
+                            //    meiHNumber = 0;
+                            ndNumber += 75;
+                        }*/
 
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
-                        {
-                            ndHNumber += 47;
-                            // 338 -> 326
-                            ndHNumber += 12;
-                        }
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                        {
-                            ndHNumber -= 36;
-                        }
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/11/01")
-                        {
-                            ndHNumber -= 196;
-                            ndHNumber -= 72;
-                        }
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                        {
-                            ndHNumber += 196;
-                            ndHNumber += 50;
-
-                        }
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/11/01")
-                        {
-                            ndHNumber += 11;
-
-                        }
                         return new
                         {
-                            NdNumber = ndNumber+ndHNumber,
+                       //     NdNumber = ndNumber+ndHNumber,
+                            NdNumber = ndNumber ,
                         };
                     }).ToList();
 
                     var MeiOMonth = monthsInYear.Select(month =>
                     {
-                        var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                        var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Startqty);
-
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/09/01")
+                    //    var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                        var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+             /*           if (month.Date.ToString("yyyy/MM/dd") == "2023/08/01")
                         {
-                            meiHNumber += 37;
-                           
-                        }
-                        if (month.Date.ToString("yyyy/MM/dd") == "2023/10/01")
-                        {
-                            meiHNumber -= 37;
-                        }
-
+                            //    meiHNumber = 0;meiNumber
+                            meiNumber += 82;
+                        }*/
                         return new
                         {
-                            MeiNumber = meiNumber+meiHNumber,
+                            //        MeiNumber = meiNumber+meiHNumber,
+                            MeiNumber = meiNumber
                         };
                     }).ToList();
 
@@ -620,15 +528,23 @@ namespace webapi.Controllers.Charts
                         var sumresult = 0;
                         var hold = monthsInYear.Select(month =>
                         {
-                            var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
-                            
-                            sumresult += Convert.ToInt32(ndHNumber) + Convert.ToInt32(meiHNumber) + Convert.ToInt32(gsHNumber);
+                            /*             var meiHNumber = MeiHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                                         var ndHNumber = NdHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+                                         var gsHNumber = GsHNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.HoldDate.ToString().AsSpan(), "yyyy/M/d H:m:s", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Qty);
+
+                                         sumresult += Convert.ToInt32(ndHNumber) + Convert.ToInt32(meiHNumber) + Convert.ToInt32(gsHNumber);*/
+
+                            var gsNumber = GsONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+                            var ndNumber = NdONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+                            var meiNumber = MeiONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+                            var qtNumber = QtONumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Qaouttime.Substring(0, 6), "yyyyMM", CultureInfo.InvariantCulture).ToString("yyyy/MM ")) == DateTime.Parse(month.Date.ToString("yyyy/MM"))).Sum(e => e.Qaoutqty);
+
+                            sumresult += Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber) + Convert.ToInt32(meiNumber) + Convert.ToInt32(qtNumber);
 
                             return new
                             {
-                                holdNumber = sumresult,
+                                // holdNumber = sumresult+3194,
+                                holdNumber = sumresult ,
                             };
                         }).ToList();
 
@@ -642,13 +558,12 @@ namespace webapi.Controllers.Charts
                         // 大于 8 月31日 的 总投量
                         var year = monthsInYear.Select(month =>
                         {
-                            if (month.Date >= new DateTime(2023,8,1)) {
                                 var meiNumber = MeiNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
                                 var ndNumber = NdNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
                                 var gsNumber = GsNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
+                                var qtNumber =QtNumber.Where(e => DateTime.Parse(DateTime.ParseExact(e.Lotstartdate, "yyyyMMdd HHmmssfff", CultureInfo.InvariantCulture).ToString("yyyy/MM/01 ")) == DateTime.Parse(month.Date.ToString("yyyy/MM/dd"))).Sum(e => e.Startqty);
 
-                                abc += Convert.ToInt32(meiNumber) + Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber);
-                            }
+                            abc += Convert.ToInt32(meiNumber) + Convert.ToInt32(gsNumber) + Convert.ToInt32(ndNumber) + Convert.ToInt32(qtNumber);
                             return new
                             {
                                 MeiNumber = abc,
@@ -746,6 +661,10 @@ namespace webapi.Controllers.Charts
                         result.Add(today);
 
 
+                        //  新增  其他类别
+                        // Test       25  ~28 
+                        result = NetRowChart.Row(result,QtNumber , QtONumber , monthsInYear, daysInMonth,"其他",myList,myList2);
+
                     }
                 }
             }
@@ -761,7 +680,7 @@ namespace webapi.Controllers.Charts
             DateTime currentDate = DateTime.Now;
             DateTime noeDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             if (currentDate.Date == noeDate.Date) {
-                currentDate.AddDays(-1);
+               currentDate = currentDate.AddDays(-1);
             }
             int year = currentDate.Year;
             int month = currentDate.Month;
@@ -789,6 +708,7 @@ namespace webapi.Controllers.Charts
 
             return result;
         }
+
 
 
     }

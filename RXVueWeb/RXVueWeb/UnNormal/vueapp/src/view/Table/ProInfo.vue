@@ -2,7 +2,7 @@
      <el-form :model="form" label-width="120px" :rules="rules">
          <el-button type="primary" > 查询</el-button>
          <el-tabs type="card" class="demo-tabs">
-             <TabTest :table="tableData" :tableLabel="tableLabel" :Tid="tableID" :total="total" @updateNum="updateNum"></TabTest>
+             <TabTest :table="tableData" :tableLabel="tableLabel" :Tid="tableID" :total="total" @updateNum="updateNum" :headerCellStyle="headerCellStyle" :rowStyle="rowStyle" :cellStyle="cellStyle"></TabTest>
          </el-tabs>
      </el-form>
 
@@ -18,6 +18,21 @@
     },
         data() {
             return {
+            headerCellStyle: {
+                background: '#4474B3',
+                color: '#ffffff',
+                'text-align': 'center',
+                'font-size': '20px'
+            },
+            rowStyle: {
+                background: '#ffffff',
+                height: '5px'
+            },
+            cellStyle: {
+                'text-align': 'center',
+                'border': '1px solid #E2DDF6',
+                'font-size': '25px'
+            },
                 tableID: 'ProInfo',
                 total: 100,
                   tableLabel: [

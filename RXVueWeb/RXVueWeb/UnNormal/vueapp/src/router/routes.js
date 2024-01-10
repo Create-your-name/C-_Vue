@@ -60,6 +60,11 @@ const routes = [
         path: '/2',
         component: () => import('@/view/Charts/Plan/WaferStartPlan.vue'),
     },
+    {
+        name: '/Scrap',
+        path: '/Scrap',
+        component: () => import('@/view/Table/ScrapInfo.vue'),
+    },
     
 ];
 export default routes

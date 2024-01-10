@@ -9,11 +9,11 @@ using Microsoft.Office.Interop.Excel;
 using System.Globalization;
 using NPOI.SS.Formula.Functions;
 using Microsoft.EntityFrameworkCore;
-using NPOI.SS.UserModel;
-using System.Diagnostics;
+using System.Text;
 using System.Collections;
-using Org.BouncyCastle.Asn1.Smime;
-using Aspose.Email.Calendar.Recurrences;
+using OfficeOpenXml;
+using System.ComponentModel;
+using System.Text;
 
 namespace webapi.Service.SaveExcel
 {
@@ -26,13 +26,12 @@ namespace webapi.Service.SaveExcel
 
             DateTime nowDate = FistTime.AddDays(-1);
             ExcelWorksheet worksheet;
-            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+           // ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             using (ExcelPackage p = new ExcelPackage())
             {
             
                 string path = ExcelPath;
                 worksheet = p.Workbook.Worksheets.Add(Sheet);
-
                 // 算法需要重构咯
                 for (int i = 1; nowDate != LastTime; nowDate = nowDate.AddDays(-1), i++)
                 {
@@ -58,7 +57,6 @@ namespace webapi.Service.SaveExcel
                         worksheet.Cells[1, l].Style.Fill.BackgroundColor.SetColor(backgroundColor);
                     }
 
-
                     // 封装 
 
                     if (ExcelPath == @"C:\TEST\DynCT_NEW.xlsx")
@@ -69,15 +67,38 @@ namespace webapi.Service.SaveExcel
                     {
                         EmailBody += CMP_JH_SptsEmailDbInsertExcel(ref worksheet, i + 1);
                     }
+                    else if (ExcelPath == @"C:\TEST\OEE.xlsx") {
+                        EmailBody += OEEmailDbInsertExcelTableOne(ref worksheet,nowDate);
+                    }
                     else {
                         Console.WriteLine("Wafer Start");
                         worksheet.Dispose();
                         string Path = @"C:\TEST\WaferStart.xlsx";
-                        EmailBody += WaferStartEmailDbInserExcel( i + 1 , Path);
+                        EmailBody += WaferStartEmailDbInserExcel(i + 1, Path);
                     }
 
                 }
-                if (path!= @"C:\TEST\WaferSt1art.xlsx") {
+                if (ExcelPath == @"C:\TEST\OEE.xlsx")
+                {
+                    DateTime nowDate2 = FistTime.AddDays(-1);
+                    EmailBody += "</tr>   ";
+                    EmailBody += "</table><br><br>";
+                    EmailBody += "<font size=2 face=Arial color=red><b>Efficiency:  <b> <hr>";
+                    EmailBody += "<table border=1 cellspacing=1 cellpadding=2 bgcolor=black width=700>";
+                    EmailBody += "<tr bgcolor=SkyBlue><td align=center width=100><font size=2 face=Arial color=black>DATA</td> <td align=center width=100><font size=2 face=Arial color=black>F5</td> <td align=center width=100><font size=2 face=Arial color=black>PH</td><td align=center width=100><font size=2 face=Arial color=black>ET</td><td align=center width=100><font size=2 face=Arial color=black>TF</td><td align=center width=100><font size=2 face=Arial color=black>DF</td><td align=center width=100><font size=2 face=Arial color=black>EPI</td></tr>";
+                    EmailBody += "<tr bgcolor=SkyBlue><td align=center width=100><font size=2 face=Arial color=black>TARGET</td> <td align=center width=100><font size=2 face=Arial color=black>86.4%</td> <td align=center width=100><font size=2 face=Arial color=black>90.9%</td><td align=center width=100><font size=2 face=Arial color=black>89.2%</td><td align=center width=100><font size=2 face=Arial color=black>89.5%</td><td align=center width=100><font size=2 face=Arial color=black>74.9%</td><td align=center width=100><font size=2 face=Arial color=black>88.3%</td></tr>";
+
+                    for (int i = 1; nowDate2 != LastTime; nowDate2 = nowDate2.AddDays(-1), i++)
+                    {
+                        EmailBody += OEEmailDbInsertExcelTableTwo(ref worksheet, nowDate2);
+                    }
+                    EmailBody += "</tr>   ";
+                    EmailBody += "</table><br><br>";
+                }
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                var encoding = Encoding.GetEncoding("UTF-8");
+                if (path != @"C:\TEST\WaferSt1art.xlsx")
+                {
                     p.SaveAs(new FileInfo(path));
                 }
             }
@@ -1248,6 +1269,76 @@ namespace webapi.Service.SaveExcel
             }
             return EmailBody;
         }
+
+        static public string OEEmailDbInsertExcelTableOne(ref ExcelWorksheet workbook , DateTime nowday) {
+            string EmailBody = "";
+            using (RxrepContext rxrep = new RxrepContext()) {
+                string formattedDate = nowday.ToString("yyyyMMdd");
+                var OEEList = rxrep.VOeeSumV2011s.Where(e => e.Pday == formattedDate).ToList();
+                string DateForEmail = nowday.ToString("yyyy-MM-dd");
+                EmailBody += "<tr bgcolor='white' align='center'><td align=center width=100><font size=2 face=Arial color=black>" + DateForEmail.ToString()+"</td> ";
+                double TT = (double)OEEList.Select(e => e.Tt).Sum();
+                double Avai = (double)OEEList.Select(e => e.Avai).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100*(Avai/TT),2) + "</td> ";
+                double PHTT = (double)OEEList.Where(e=>e.Module== "PHOTO").Select(e => e.Tt).Sum();
+                double PHAvai = (double)OEEList.Where(e => e.Module == "PHOTO").Select(e => e.Avai).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (PHAvai / PHTT), 2) + "</td> ";
+                double ETTT = (double)OEEList.Where(e => e.Module == "ETCH").Select(e => e.Tt).Sum();
+                double ETAvai = (double)OEEList.Where(e => e.Module == "ETCH").Select(e => e.Avai).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (ETAvai / ETTT), 2) + "</td> ";
+                double TFTT = (double)OEEList.Where(e => e.Module == "THINF").Select(e => e.Tt).Sum();
+                double TFAvai = (double)OEEList.Where(e => e.Module == "THINF").Select(e => e.Avai).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (TFAvai / TFTT), 2) + "</td> ";
+                double DFTT = (double)OEEList.Where(e => e.Module == "DIFF").Select(e => e.Tt).Sum();
+                double DFAvai = (double)OEEList.Where(e => e.Module == "DIFF").Select(e => e.Avai).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (DFAvai / DFTT), 2) + "</td> ";
+
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round((Math.Round(100 * (PHAvai / PHTT), 2) + Math.Round(100 * (ETAvai / ETTT), 2) + Math.Round(100 * (TFAvai / TFTT), 2)+ Math.Round(100 * (DFAvai / DFTT), 2))/4 ,2)+ "</td> ";
+
+                EmailBody += "</tr>";
+            }
+
+            return EmailBody;
+        }
+
+        static public string OEEmailDbInsertExcelTableTwo(ref ExcelWorksheet workbook, DateTime nowday)
+        {
+            string EmailBody = "";
+            using (RxrepContext rxrep = new RxrepContext())
+            {
+                string formattedDate = nowday.ToString("yyyyMMdd");
+                var OEEList = rxrep.VOeeSumV2011s.Where(e => e.Pday == formattedDate).ToList();
+                string DateForEmail = nowday.ToString("yyyy-MM-dd");
+                EmailBody += "<tr bgcolor='white' align='center'><td align=center width=100><font size=2 face=Arial color=black>" + DateForEmail.ToString() + "</td> ";
+                // 2 
+                double EFF = (double)OEEList.Select(e => e.Eff).Sum();
+                double EFFRun = (double)OEEList.Select(e => e.Effrun).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (EFF * 60 / EFFRun), 2) + "</td> ";
+                double PHEFF = (double)OEEList.Where(e => e.Module == "PHOTO").Select(e => e.Eff).Sum();
+                double PHEFFRun = (double)OEEList.Where(e => e.Module == "PHOTO").Select(e => e.Effrun).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (PHEFF * 60 / PHEFFRun), 2) + "</td> ";
+                double ETEFF = (double)OEEList.Where(e => e.Module == "ETCH").Select(e => e.Eff).Sum();
+                double ETEFFRun = (double)OEEList.Where(e => e.Module == "ETCH").Select(e => e.Effrun).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (ETEFF * 60 / ETEFFRun), 2) + "</td> ";
+                double TFEFF = (double)OEEList.Where(e => e.Module == "THINF").Select(e => e.Eff).Sum();
+                double TFEFFRun = (double)OEEList.Where(e => e.Module == "THINF").Select(e => e.Effrun).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (TFEFF * 60 / TFEFFRun), 2) + "</td> ";
+                double DFEFF = (double)OEEList.Where(e => e.Module == "DIFF").Select(e => e.Eff).Sum();
+                double DFEFFRun = (double)OEEList.Where(e => e.Module == "DIFF").Select(e => e.Effrun).Sum();
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round(100 * (DFEFF * 60 / DFEFFRun), 2) + "</td> ";
+
+                EmailBody += "<td align=center width=100><font size=2 face=Arial color=black>" + Math.Round((Math.Round(100 * (TFEFF * 60 / TFEFFRun), 2) + Math.Round(100 * (PHEFF * 60 / PHEFFRun), 2) + Math.Round(100 * (ETEFF * 60 / ETEFFRun), 2) + Math.Round(100 * (DFEFF * 60 / DFEFFRun), 2)) / 4, 2) + "</td> ";
+
+
+                EmailBody += "</tr>";
+
+            }
+
+            return EmailBody;
+        }
+
+
+
 
     }
 }

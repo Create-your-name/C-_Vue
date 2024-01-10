@@ -6,11 +6,10 @@ D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\webapi.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\webapi.runtimeconfig.json
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\webapi.pdb
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Aspose.Email.dll
+D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\DocumentFormat.OpenXml.dll
+D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\DocumentFormat.OpenXml.Framework.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Enums.NET.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\EPPlus.dll
-D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\EPPlus.Interfaces.dll
-D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\EPPlus.System.Drawing.dll
-D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Office.Interop.Excel.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Hangfire.AspNetCore.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Hangfire.Core.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Hangfire.MemoryStorage.dll
@@ -32,6 +31,7 @@ D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Extensi
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Extensions.Options.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Extensions.Primitives.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.IO.RecyclableMemoryStream.dll
+D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Office.Interop.Excel.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Office.Interop.Outlook.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.OpenApi.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
@@ -65,7 +65,6 @@ D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Security.C
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Security.Cryptography.Xml.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Security.Permissions.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Text.Encodings.Web.dll
-D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Text.Json.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\System.Windows.Extensions.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\ca\Hangfire.Core.resources.dll
 D:\code\RXVueWeb\UnNormal\webapi\obj\Release\net6.0\PubTmp\Out\de\Hangfire.Core.resources.dll
