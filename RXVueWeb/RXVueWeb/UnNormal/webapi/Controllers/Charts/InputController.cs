@@ -165,7 +165,7 @@ namespace webapi.Controllers.Charts
                                 MeiNumber = Math.Round((double)(meiNumber ) / dayInMonth, 2),
                             };
                         }).ToList();
-                        var myList2 = new List<int> { 0, 0 };
+                        var myList2 = new List<int> { 0};
 
                         // Wafer Start  投入 +2  +年平均
                         string title = "GS";
@@ -373,7 +373,7 @@ namespace webapi.Controllers.Charts
                         }).ToList();
 
                         // Wafer Out
-                        var myList = new List<int> { 0, 0};
+                        var myList = new List<int> { 0};
 
 
                         string GSout = "GS";
@@ -696,7 +696,7 @@ namespace webapi.Controllers.Charts
             }
 
 
-            for (int day = 1; day <= 2; day++)
+            for (int day = 1; day <= 1; day++)
             {
                 DateTime date = new DateTime(year, month, day);
                 string formattedDate = "";

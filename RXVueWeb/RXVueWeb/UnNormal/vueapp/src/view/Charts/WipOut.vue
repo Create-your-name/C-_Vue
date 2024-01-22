@@ -20,97 +20,136 @@
                 </div>
             </el-col>
         </el-row>
-        <el-table ref="filterTable"
-                  :id="Tid"
-                  :data="table"
-                  size="small"
-                  align="center"
-                  row-class-name="row"
-                  cell-class-name="column"
-                  :highlight-current-row="true"
-                  :header-cell-style="headerCellStyle"
-                  :row-style="rowStyle"
-                  :cell-style="cellStyle"
-                  @cell-click="clickRow"
-                  @row-click="test"
-                  @row-dblclick="rowdblclick"
-                  @selection-change="SelectChange"
-                  height="600"
-                  style="width: 100% ;overflow: hidden"
-                  v-loading="tableLoading"
-                  :fit="true"
-                  :stripe="false"
-                  element-loading-text="加载中"
-                  v-scroller
-                  v-horizontal-scroll>
-            <template v-for=" item in tableLabel">
-                <el-table-column v-if="item.show"
-                                 :key="item.prop"
-                                 :show-overflow-tooltip="true"
-                                 sortable
-                                 :prop="item.prop"
-                                 :width="item.width"
-                                 :label="item.label" />
-                <el-table-column v-if="item.HoldNumber"
-                                 :label="item.label"
-                                 :prop="item.prop"
-                                 :key="item.prop"
-                                 :width="item.width">
-                    <template #default="scope">
-                        <el-link @click="handleLinkClick(scope.row.dept)" target="_blank" class="font-microsoft" :underline="false">{{scope.row[item.prop]}}</el-link>
-                    </template>
-                </el-table-column>
-            </template>
-        </el-table>
     </div>
+
+    <div style="margin:auto; top: 0; left: 0; height:120px ">
+    </div>
+
+    <div style="margin:auto; top: 0; left: 0; width:2850px ; background: rgba(228, 245, 255, 1)">
+        <linkTable :table="tableData.Data" :tableLabel="tableLabel.Label" :name="WaferOut"></linkTable>
+    </div>
+
 </template>
 <script>
     import { reactive, onMounted } from 'vue';
     import axios from 'axios';
     import * as echarts from 'echarts';
+    import linkTable from "./linkTable.vue"
+
 
     export default {
+                    data() {
+                return {
+            WaferOut:"WaferOut",
+          //        tableData: [],
+                formData: [],
+                }
+
+            },
+        mounted() {
+          
+            document.title = "Wafer Out "
+        },
+        components: {
+            linkTable,
+        },
         setup() {
             let data = reactive({});
             let xdata = reactive([]);
             let ydata = reactive([]);
             let day = reactive([]);
             let today = 0;
+            let tableData = reactive({
+                Data: [],
+            });// 存储表格数据的变量
+            const tableLabel = reactive({
+                Label: [],
+            });
 
             async function GetData() {
-              try {
-              //  const res = await axios.get("https://localhost:7155/api/Charts/Date");
-                const res = await axios.get("http://10.163.76.23/api/api/Charts/Date");
-                data.value = res.data;
-                console.log(data);
-                day = res.data.map(v => v.dateDay).concat(Array.from({length: 12}, (_, i) => i + 1 +'月'));
-                var currentDate = new Date();
-                today = currentDate.getDate();
-                console.log(today);
-              } catch (error) {
-                console.error(error);
-              }
+                try {
+                    //      display:none;
+                    const res = await axios.get("https://localhost:7155/api/Charts/Date");
+                    //   const res = await axios.get("http://10.163.76.23/api/api/Charts/Date");
+                    data.value = res.data;
+                    // console.log(data);
+
+                    let transformedCols = reactive([]);
+                    tableLabel.Label = res.data.map(v => v.dateDay).concat(Array.from({ length: 12 }, (_, i) => i + 1 + '月')); // 根据返回数据设置新的列名
+                    tableLabel.Label.unshift("产品");
+
+
+                    transformedCols = tableLabel.Label.map((v, i) => {
+                        if (i < 32  && i>0) { // 前 31 个元素
+                            return { label: v, width: '63', prop: v, url: true };
+                        } else { // 其他元素
+                            return { label: v, width: '63', prop: v, show: true };
+                        }
+                      });
+
+                    //                  console.log(transformedCols);
+                    tableLabel.Label = transformedCols
+                  //  console.log(tableLabel);
+                    day = res.data.map(v => v.dateDay).concat(Array.from({ length: 12 }, (_, i) => i + 1 + '月'));
+                    var currentDate = new Date();
+
+                    today = currentDate.getDate();
+                    console.log(today);
+                    // console.log(day);
+                } catch (error) {
+                    console.error(error);
+                }
             }
 
 
             async function GetChartsList() {
                 try {
-              //     const res = await axios.get("https://localhost:7155/api/Charts/Product");
-                     const res = await axios.get("http://10.163.76.23/api/api/Charts/Product");
-                    data.value = res.data;
-             //       console.log(data);
+                    const res = await axios.get("https://localhost:7155/api/Charts/Product");
+                    // const res = await axios.get("http://10.163.76.23/api/api/Charts/Product");
+                    tableData.Data = res.data;
+                    console.log(tableData.Data);
+                    const newTableData = reactive([]);
+                    for (let i = 10; i < 17; i++) {
+                        const item = tableData.Data[i];
+                        const rowData = {};
+                        if (i == 13) {
+                            const itemQt = tableData.Data[27];
+                            const rowDataQt = {};
+                            //     console.log(itemQt);
+                            rowDataQt['产品'] = itemQt.title;
+                            for (let j = 1; j < itemQt.num.length + 1; j++) {
+                                if (tableLabel.Label[j].prop != '产品') {
+                                    rowDataQt[tableLabel.Label[j].prop] = itemQt.num[j -1] == null ? 0 : itemQt.num[j -1];
+                                }
+                            }
+                            //     console.log(rowDataQt);
+                            newTableData.push(rowDataQt);
+                        }
+                        rowData['产品'] = item.title;
+                  //      console.log(tableLabel.Label);
+                        for (let j = 1; j < tableData.Data[0].num.length + 1; j++) {
+                            if (tableLabel.Label[j].prop != '产品') {
+                                rowData[tableLabel.Label[j].prop] = item.num[j - 1] == null ? 0 : item.num[j - 1];
+                            }
+                        }
+                        rowData['产品名'] = item.title;
+                        newTableData.push(rowData);
+                    }
+
+                    tableData.Data = newTableData;
+                    console.log(newTableData);
+                    console.log(tableData);
                     xdata = res.data.map(v => v.title).slice();
                     ydata = res.data.map(v => v.num).slice();
-
-                 //    console.log(ydata);
                 } catch (error) {
                     console.error(error);
                 }
             }
 
             onMounted(async () => {
+
+                await GetData();
                 await GetChartsList().then(async () => {
-                    await GetData();
                     let WaferOut = echarts.init(document.getElementById("MounthOut"));
                     let YearOut = echarts.init(document.getElementById("YearOut"));
 
@@ -663,7 +702,10 @@
                 xdata,
                 ydata,
                 day,
+                tableLabel,
+                tableData,
             };
+
         },
     };
 

@@ -3,33 +3,35 @@
 
     <Excel :Tid="Tid"></Excel>
     <el-button type="primary" class="el-icon-s-operation" click @click="ziduanpeizhi">字段配置</el-button>
-
-    <!--: id   =>  v-bind :id  同  script 中的""后的Tid属性对应赋值-->
-
-    
-    <el-table ref="filterTable"
-              :id="Tid"
-              :data="table"
-              size="small"
-              align="center"
-              row-class-name="row"
-              cell-class-name="column"
-              :highlight-current-row="true"
-              :header-cell-style="headerCellStyle"
-              :row-style="rowStyle"
-              :cell-style="cellStyle"
-              @cell-click="clickRow"
-              @row-click="test"
-              @row-dblclick="rowdblclick"
-              @selection-change="SelectChange"
-              height="600"
-              style="width: 100% ;overflow: hidden"
-              v-loading="tableLoading"
-              :fit="true" 
-              :stripe="false"
-              element-loading-text="加载中"
-              v-scroller
-              v-horizontal-scroll>
+<!--    
+              :data="table.slice((currentPage-1)*pagesize,currentPage*pagesize)"-->
+<el-table ref="filterTable"
+          :id="Tid"
+          :data="table"
+          size="small"
+          align="center"
+          row-class-name="row"
+          cell-class-name="column"
+          :highlight-current-row="true"
+          :header-cell-style="headerCellStyle"
+          :row-style="rowStyle"
+          :cell-style="cellStyle"
+          :summary-method="getSummaries"
+          :show-summary="totalname"
+          :summary-row-class-name="() => 'gray-background'"
+          @cell-click="clickRow"
+          @row-click="test"
+          @row-dblclick="rowdblclick"
+          @selection-change="SelectChange"
+          :height="heightLight"
+          style="width: 100% ;overflow: hidden"
+          v-loading="tableLoading"
+          :fit="true"
+          :stripe="false"
+          element-loading-text="加载中"
+          v-scroller
+          v-horizontal-scroll
+          >
         <template v-for=" item in tableLabel">
             <el-table-column v-if="item.show"
                              :key="item.prop"
@@ -55,6 +57,18 @@
                              :width="item.width">
                 <template #default="scope">
                     <el-link @click="handleLinkClick24(scope.row.dept)" target="_blank" class="font-microsoft" :underline="false">{{scope.row[item.prop]}}</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column v-if="item.ENG"
+                             :label="item.label"
+                             :key="item.prop"
+                             :width="item.width">
+                <template #default="scope">
+                    <el-link :href="'http://10.163.76.11/MES/pms_report/otd/rep_exceptionallot_query1.asp?select10=' + scope.row[item.prop]"
+                             target="_blank" class="buttonText" type="primary" :underline="false"
+                             :style="{ 'font-size': '25px' }">
+                        {{ scope.row[item.prop] }}
+                    </el-link>
                 </template>
             </el-table-column>
             <el-table-column v-if="item.halfNumber"
@@ -83,9 +97,10 @@
                     <el-link :href=" 'http://6n-oa-eip.rxgz.crmicro.com/jump.aspx?tid=' +scope.row.tid + '&pid='+scope.row.pid +'&acc=amlhbmdtZWl5dWFu&viewtype=2'" target="_blank" class="buttonText" type="primary" :underline="false">过程</el-link>
                 </template>
             </el-table-column>
+
         </template>
     </el-table>
-  <!--  <div style="text-align:center">
+<!--    <div style="text-align:center">
         <el-pagination hide-on-single-page background layout="prev, pager, next,total" :total="total" :page-size="pagesize" @current-change="current_change"></el-pagination>
     </div>-->
 
@@ -121,44 +136,61 @@
 
 <style>
     /*     style 加上 scoped  指的是 给本页面中的所有控件 加上一个范围 scoped 中  会给本页面中每个组件生成一个统一的ID 来区分
-                                                                                                  如果 传递了子组件进来 则给子组件一样赋值这个统一ID
-                                                                                                  (前提是子组件根组件唯一)
+                                                                                                      如果 传递了子组件进来 则给子组件一样赋值这个统一ID
+                                                                                                      (前提是子组件根组件唯一)
 
 
-                                                                                                                              console.log(row.pid);
-                                                                                                                              console.log(row.tid);
+                                                                                                                                  console.log(row.pid);
+                                                                                                                                  console.log(row.tid);
 
-                                                            ：deep(组件){}     深度选择器
-                                                            ：global(组件)     全局选择器
+                                                                ：deep(组件){}     深度选择器
+                                                                ：global(组件)     全局选择器
 
-                                                            ：class="$style.类名"  可以指定他 的style 使用
-                     */
+                                                                ：class="$style.类名"  可以指定他 的style 使用
+                         */
 
-.font-microsoft {
-    font-family: "Microsoft YaHei", sans-serif;
-    font-size: larger; /* 调整字体大小 */
-}
-
-    .el-scrollbar__thumb{
-    background-color :black;
+    .font-microsoft {
+        font-family: "Microsoft YaHei", sans-serif;
+        font-size: larger; /* 调整字体大小 */
     }
+
+    .el-scrollbar__thumb {
+        background-color: black;
+    }
+
     .el-table {
-    &:deep(.el-table__header) {
-      col[name="gutter"] {
+        &:deep(.el-table__header)
+
+    {
+        col [name="gutter"]
+
+    {
         display: table-cell !important;
-      }
     }
- }
-.red-font {
-  color: red;
-}
+
+    }
+    }
+
+    .red-font {
+        color: red;
+    }
+
+    .gray-background {
+    background-color: #11C4CA;
+     color: red;
+    }
+
+    .disable-mouse-wheel {
+          pointer-events: none;
+        }
+
 </style>
 <script>
 
     import Excel from '@/components/FromExcel.vue'
 
     export default {
-        props: ['table', 'tableLabel', 'Tid', 'total','headerCellStyle','rowStyle','cellStyle'],
+        props: ['table', 'tableLabel', 'Tid', 'total','headerCellStyle','rowStyle','cellStyle' , 'heightLight','totalname'],
 
         components: {
             Excel
@@ -181,7 +213,7 @@
             };
             return {
                 selectAll:1,
-                pagesize: 100,
+                pagesize: this.total,
                 currentPage: 1,
                 dialogFormVisible: false,
 
@@ -203,6 +235,36 @@
                 window.addEventListener('scroll', this.handleScroll);
             },
     methods: {
+
+        // 求和操作
+        getSummaries(param) {
+            const { columns, data } = param;
+            console.log(param);
+            let sum = 0;
+
+            // 遍历数据列表，累加第二列数据的值
+            data.forEach(item => {
+                sum += item[columns[2].property];
+     
+            });
+
+            // 将累加结果显示在表格上
+            const sums = [];
+            columns.forEach((column, index) => {
+
+  
+                    if (index === 0) {
+                        sums[index] = <span style={ { fontSize: '25px' } }> 合计 < /span>;
+                    }
+                    if (index === 2) {
+                        sums[index] = <span style={ { fontSize: '25px' } }> { sum } < /span>;
+                    }
+    
+            });
+            return sums;
+        },
+
+
         handleSelectAll(value) {
             const selected = value; // 当选中值为 '1' 时，设置 selected 为 true，否则为 false
             if (selected === '2') {
@@ -239,7 +301,8 @@
             test(row) {
                 console.log('被点击了');
                 console.log(row.pid);
-                console.log(this.total);
+                console.log(this.currentPage);
+            console.log(this.pagesize);
             },
 
             current_change(currentPage) {

@@ -6,7 +6,7 @@
          public    string? Product{ get; set; }
         public string? Lotid { get; set; }
 
-        public string? Number { get; set; }
+        public int Number { get; set; }
         public string? Location { get; set; }
 
         public string? Repstage { get; set; }
@@ -38,6 +38,12 @@
         public string? starttime { get; set; }
         public string? statetime { get; set; }
         public string? Ratio { get; set; }
+
+
+
+        public string? Department { get; set; }
+        public string? RequestTime { get; set; }
+        public string? aim { get; set; }
 
     }
 }

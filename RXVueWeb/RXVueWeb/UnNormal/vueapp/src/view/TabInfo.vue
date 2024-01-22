@@ -213,7 +213,7 @@
                 };
             return{
                 tableID: 'T2',
-                total:0,      
+                total:1000,      
                 headerCellStyle: {
                 background:'#9ACD32',height:'250',color:'#000000',border: '1px solid tan','text-align':'center',
                 },

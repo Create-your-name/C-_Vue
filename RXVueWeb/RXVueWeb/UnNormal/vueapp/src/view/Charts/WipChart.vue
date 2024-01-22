@@ -19,33 +19,90 @@
             </el-col>
         </el-row>
     </div>
+    <div style="margin:auto; top: 0; left: 0; height:120px ">
 
+    </div>
 
+    <div style="margin:auto; top: 0; left: 0; width:2850px ; background: rgba(228, 245, 255, 1)">
+        <linkTable :table="tableData.Data" :tableLabel="tableLabel.Label" :name="WaferStart"></linkTable>
+    </div>
+
+    <!--    <el-table :data="tableData" :show-header="true" style="width: 100%">
+            <template v-for=" item in tableLabel">
+                <el-table-column v-if="item.show"
+                                 :key="item.prop"
+                                 :show-overflow-tooltip="true"
+                                 sortable
+                                 :prop="item.prop"
+                                 :width="item.width"
+                                 :label="item.label" />
+            </template>
+        </el-table>-->
 </template>
 <script>
-    import { reactive, onMounted } from 'vue';
+    import { reactive, onMounted  , watchEffect } from 'vue';
     import axios from 'axios';
     import * as echarts from 'echarts';
+    import linkTable from "./linkTable.vue"
 
     export default {
+             mounted() {  
+            document.title = "Wafer Start"
+            },
+            components: {
+                linkTable,
+            },
+            data() {
+                return {
+            WaferStart:"WaferStart",
+//                    tableData: [],
+                    formData: [],
+                }
+
+            },
         setup() {
             let data = reactive({});
             let xdata = reactive([]);
             let ydata = reactive([]);
             let day = reactive([]);
             let today = 0;
+            let tableData = reactive({
+                Data : [] ,
+            });// 存储表格数据的变量
+            const tableLabel = reactive({
+                Label: [],
+            });
+    
 
-            async function GetData() {
+            async  function GetData() {
                 try {
                     //      display:none;
-                 //   const res = await axios.get("https://localhost:7155/api/Charts/Date");
-                    const res = await axios.get("http://10.163.76.23/api/api/Charts/Date");
+                    const res = await axios.get("https://localhost:7155/api/Charts/Date");
+                 //   const res = await axios.get("http://10.163.76.23/api/api/Charts/Date");
                     data.value = res.data;
-                    console.log(data);
+                   // console.log(data);
+         
+                    let transformedCols = reactive([]);
+                    tableLabel.Label = res.data.map(v => v.dateDay).concat(Array.from({ length: 12 }, (_, i) => i + 1 + '月')); // 根据返回数据设置新的列名
+                     tableLabel.Label.unshift("产品");
+  
+
+                    transformedCols = tableLabel.Label.map((v, i) => {
+                    if (i < 32 && i > 0) { // 前 31 个元素
+                            return { label: v, width: '63', prop: v, url: true };
+                        } else { // 其他元素
+                            return { label: v, width: '63', prop: v, show: true };
+                        }
+                    });
+
+  //                  console.log(transformedCols);
+                    tableLabel.Label = transformedCols
+                  //  console.log(tableLabel);
                     day = res.data.map(v => v.dateDay).concat(Array.from({ length: 12 }, (_, i) => i + 1 + '月'));
                     var currentDate = new Date();
+
                     today = currentDate.getDate();
-                    console.log(today);
+                    //console.log(today);
                     // console.log(day);
                 } catch (error) {
                     console.error(error);
@@ -53,22 +110,53 @@
             }
 
 
-            async function GetChartsList() {
-                try {
-                  //  const res = await axios.get("https://localhost:7155/api/Charts/Product");
-                    const res = await axios.get("http://10.163.76.23/api/api/Charts/Product");
-                    data.value = res.data;
-                    //       console.log(data);
-                    xdata = res.data.map(v => v.title).slice();
-                    ydata = res.data.map(v => v.num).slice();
-                } catch (error) {
-                    console.error(error);
+        async function GetChartsList() {
+            try {
+                const res = await axios.get("https://localhost:7155/api/Charts/Product");
+                // const res = await axios.get("http://10.163.76.23/api/api/Charts/Product");
+                tableData.Data = res.data;
+                console.log(tableData.Data);
+                const newTableData = reactive([]);
+                for (let i = 0; i < 7; i++) { 
+                    const item = tableData.Data[i];
+                    const rowData = {};
+                    if ( i == 3) {
+                        const itemQt = tableData.Data[25];
+                        const rowDataQt = {};
+                   //     console.log(itemQt);
+                        rowDataQt['产品'] = itemQt.title;
+                        for (let j = 1; j < itemQt.num.length + 1; j++) {
+                            if (tableLabel.Label[j].prop != '产品') {
+                                rowDataQt[tableLabel.Label[j].prop] = itemQt.num[j -1] == null ? 0 : itemQt.num[j -1 ];
+                            }
+                        }
+                   //     console.log(rowDataQt);
+                        newTableData.push(rowDataQt);
+                    }
+                    rowData['产品'] = item.title; 
+                //    console.log(tableLabel.Label);
+                    for (let j = 1; j < tableData.Data[0].num.length +1; j++) {
+                        if (tableLabel.Label[j].prop != '产品') {
+                            rowData[tableLabel.Label[j].prop] = item.num[j-1] == null ? 0 : item.num[j-1];
+                        }
+                    }
+                    rowData['产品名'] = item.title;
+                    newTableData.push(rowData);
                 }
+
+                tableData.Data = newTableData;
+                console.log(newTableData);
+                console.log(tableData);
+                xdata = res.data.map(v => v.title).slice();
+                ydata = res.data.map(v => v.num).slice();
+            } catch (error) {
+                console.error(error);
             }
+        }
 
             onMounted(async () => {
+                await GetData();
                 await GetChartsList().then(async () => {
-                    await GetData();
                     let myChart = echarts.init(document.getElementById("MounthChart"));
                     let Year = echarts.init(document.getElementById("YearChart"));
                     Year.setOption({
@@ -610,6 +698,16 @@
                 });
             });
 
+            watchEffect(() => {
+                // 通过watchEffect监听变量的变化，在变量全部初始化完成后再传递给子组件。
+         //       if (tableData.length !== 0 && tableLabel.length !== 0) {
+         //           return {
+         //               table: tableData,
+         //               tableLabel: tableLabel
+         //           }
+          //      }
+            });
+
             return {
                 GetChartsList,
                 GetData,
@@ -617,6 +715,8 @@
                 xdata,
                 ydata,
                 day,
+                tableLabel,
+                tableData,
             };
         },
     };

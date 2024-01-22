@@ -2,7 +2,7 @@
      <el-form :model="form" label-width="120px" :rules="rules">
          <el-tabs type="card" class="demo-tabs">
 
-             <el-tab-pane label="总异常剔片报表" name="first"  >
+             <el-tab-pane label="总异常剔片报表" name="first">
                  <el-divider>
                      <el-icon>
                          <HomeFilled />
@@ -180,104 +180,104 @@
                  </el-row>
 
                  <!--         <el-form-item label="当前状态" prop="status">
-                <el-checkbox-group v-model="form.status">
-                    <el-radio v-model="form.status" label="1">工程师确认</el-radio>
-                    <el-radio v-model="form.status" label="2">主管确认</el-radio>
-                    <el-radio v-model="form.status" label="3">产品OWNER处理</el-radio>
-                    <el-radio v-model="form.status" label="4">同意处置结束</el-radio>
-                    <el-radio v-model="form.status" label="5">重新处置结束</el-radio>
-                </el-checkbox-group>
-            </el-form-item>-->
+        <el-checkbox-group v-model="form.status">
+            <el-radio v-model="form.status" label="1">工程师确认</el-radio>
+            <el-radio v-model="form.status" label="2">主管确认</el-radio>
+            <el-radio v-model="form.status" label="3">产品OWNER处理</el-radio>
+            <el-radio v-model="form.status" label="4">同意处置结束</el-radio>
+            <el-radio v-model="form.status" label="5">重新处置结束</el-radio>
+        </el-checkbox-group>
+    </el-form-item>-->
                  <!--<el-form-item label="请选择查询栏位">
-                <el-button type="primary">
-                    <router-link to="/ListSelect">选择 </router-link>
-                </el-button>
-            </el-form-item>
+        <el-button type="primary">
+            <router-link to="/ListSelect">选择 </router-link>
+        </el-button>
+    </el-form-item>
 
-            <el-form-item label="排序">
-                <el-text class="mx-1" type="danger" style="margin-left:50px">第一顺序</el-text>
-                <el-select v-model="form.region" placeholder="第一顺序">
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
-                </el-select>
-                <el-text class="mx-1" type="primary" style="margin-left:50px">第二顺序</el-text>
-                <el-select v-model="form.region2" placeholder="第二顺序">
-                    <el-option label="Zone one" value="shanghai" />
-                    <el-option label="Zone two" value="beijing" />
-                </el-select>
-            </el-form-item>-->
+    <el-form-item label="排序">
+        <el-text class="mx-1" type="danger" style="margin-left:50px">第一顺序</el-text>
+        <el-select v-model="form.region" placeholder="第一顺序">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+        </el-select>
+        <el-text class="mx-1" type="primary" style="margin-left:50px">第二顺序</el-text>
+        <el-select v-model="form.region2" placeholder="第二顺序">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+        </el-select>
+    </el-form-item>-->
 
                  <el-button type="primary" @click="getDataList()"> 查询</el-button>
                  <TabTest :table="formData" :tableLabel="tableLabel" :Tid="tableID" :total="total" @updateNum="updateNum" :headerCellStyle="headerCellStyle" :rowStyle="rowStyle" :cellStyle="cellStyle"></TabTest>
                  <!--      <el-button @click="saveForm('ruleForm')"> 查询</el-button>-->
                  <!--<el-table :data="formData" id="tableId" border style="width: 100% ; font-size: 5px" height="900" :row-style="{background:'#AFEEEE',height:5+'px'}"
-                      :header-cell-style="{background:'#9ACD32',height:'250',color:'#000000',border: '1px solid tan'}" v-horizontal-scroll="'always'">
-                <el-table-column fixed="left" prop="ph" label="批号" width="100" />
-                <el-table-column fixed="left" prop="no" label="TASKID" width="180" />
-                <el-table-column prop="cppz" label="产品总类" width="150" />
-                <el-table-column label="ABNORM CARD" width="150" />
-                <el-table-column prop="recipeid" label="RecipeID" width="100" />
-                <el-table-column prop="lps" label="来片数" width="100" />
-                <el-table-column prop="kyps" label="可疑片数" width="100" />
-                <el-table-column prop="gy" label="工艺" width="150" />
-                <el-table-column prop="lottype" label="LOTTYPE" width="100" />
-                <el-table-column prop="location" label="LOCATION" width="100" />
-                <el-table-column prop="stage" label="STAGE" width="100" />
-                <el-table-column prop="equipid" label="EQUIP ID" width="100" />
-                <el-table-column prop="cpowner" label="产品OWNER" width="100" />
-                <el-table-column prop="zxyc" label="异常现象" width="150" />
-                <el-table-column prop="clbm" label="处理部门" width="100" />
-                <el-table-column prop="tzgcs" label="通知工程师" width="100" />
-                <el-table-column prop="xxms" label="现象描述" width="2700" />
-                <el-table-column prop="applyDate" label="发现日期" width="200" />
-                <el-table-column prop="applyName" label="发现人" width="100" />
-                <el-table-column prop="ycclBm" label="异常部门" width="100" />
-                <el-table-column prop="ycclXz" label="异常现象" width="150" />
-                <el-table-column prop="ycclFl" label="异常分类" width="100" />
-                <el-table-column prop="ycclcc" label="异常层次" width="100" />
-                <el-table-column prop="yocap" label="有无OCAP" width="100" />
-                <el-table-column prop="ycms" label="工程师对异常的描述" width="2700" />
-                <el-table-column prop="ycxxqr" label="工程师确认的异常现象" width="200" />
-                <el-table-column prop="ycyygl" label="异常原因归类" width="100" />
-                <el-table-column prop="cbyyfx" label="初步原因分析" width="800" />
-                <el-table-column prop="ycid" label="异常EQUIPID" width="150" />
-                <el-table-column prop="ycms" label="设备/菜单临时措施" width="2700" />
-                <el-table-column prop="sftzowner" label="是否通知产品OWNER/FMA" width="300" />
-                <el-table-column prop="c1" label="工程师异常放行" width="150" />
-                <el-table-column prop="c2" label="工程师返工" width="150" />
-                <el-table-column prop="c3" label="工程师报废" width="150" />
-                <el-table-column prop="c4" label="工程师正常放行" width="150" />
-                <el-table-column prop="ycclgcs" label="处理工程师" width="100" />
-                <el-table-column prop="ycqrQrzgQrrq" label="处理日期" width="100" />
-                <el-table-column prop="cpownerQryj" label="确认意见" width="500" />
-                <el-table-column prop="cpownerYcdj" label="异常等级" width="100" />
-                <el-table-column prop="z1" label="再处理异常放行" width="150" />
-                <el-table-column prop="z2" label="再处理返工" width="150" />
-                <el-table-column prop="z3" label="再处理在处理报废" width="150" />
-                <el-table-column prop="z4" label="再处理正常放行" width="150" />
-                <el-table-column prop="cpowmerQzyx" label="产品潜在影响" width="100" />
-                <el-table-column prop="cpownerSfxyzrbmyyfx" label="是否需要责任部门原因分析" width="200" />
-                <el-table-column prop="cpownerSfkmrb" label="是否开MRB" width="100" />
-                <el-table-column prop="cponwerName" label="确认工程师" width="100" />
-                <el-table-column prop="cpownerRq" label="确认日期" width="100" />
-                <el-table-column label="表单状态" width="100" />
-                <el-table-column label="是否挂起" width="100" />
-                <el-table-column label="被谁拒绝" width="100" />
-                <el-table-column label="过程" width="100" />
-                <el-table-column prop="location" label="责任部门一" width="100" />
-                <el-table-column prop="c1" label="报废" width="100" />
-                <el-table-column prop="c2" label="返工" width="100" />
-                <el-table-column prop="c3" label="异常放行" width="100" />
-                <el-table-column prop="c4" label="正常放行" width="100" />
-                <el-table-column label="原因六大类" width="100" />
-                <el-table-column prop="ycclBm" label="责任部门二" width="100" />
-                <el-table-column prop="z1" label="报废" width="100" />
-                <el-table-column prop="z2" label="返工" width="100" />
-                <el-table-column prop="z3" label="异常放行" width="100" />
-                <el-table-column prop="z4" label="正常放行" width="100" />
-                <el-table-column label="原因六大类" width="100" />
-                <el-table-column label="备注" width="100" />
-            </el-table>-->
+              :header-cell-style="{background:'#9ACD32',height:'250',color:'#000000',border: '1px solid tan'}" v-horizontal-scroll="'always'">
+        <el-table-column fixed="left" prop="ph" label="批号" width="100" />
+        <el-table-column fixed="left" prop="no" label="TASKID" width="180" />
+        <el-table-column prop="cppz" label="产品总类" width="150" />
+        <el-table-column label="ABNORM CARD" width="150" />
+        <el-table-column prop="recipeid" label="RecipeID" width="100" />
+        <el-table-column prop="lps" label="来片数" width="100" />
+        <el-table-column prop="kyps" label="可疑片数" width="100" />
+        <el-table-column prop="gy" label="工艺" width="150" />
+        <el-table-column prop="lottype" label="LOTTYPE" width="100" />
+        <el-table-column prop="location" label="LOCATION" width="100" />
+        <el-table-column prop="stage" label="STAGE" width="100" />
+        <el-table-column prop="equipid" label="EQUIP ID" width="100" />
+        <el-table-column prop="cpowner" label="产品OWNER" width="100" />
+        <el-table-column prop="zxyc" label="异常现象" width="150" />
+        <el-table-column prop="clbm" label="处理部门" width="100" />
+        <el-table-column prop="tzgcs" label="通知工程师" width="100" />
+        <el-table-column prop="xxms" label="现象描述" width="2700" />
+        <el-table-column prop="applyDate" label="发现日期" width="200" />
+        <el-table-column prop="applyName" label="发现人" width="100" />
+        <el-table-column prop="ycclBm" label="异常部门" width="100" />
+        <el-table-column prop="ycclXz" label="异常现象" width="150" />
+        <el-table-column prop="ycclFl" label="异常分类" width="100" />
+        <el-table-column prop="ycclcc" label="异常层次" width="100" />
+        <el-table-column prop="yocap" label="有无OCAP" width="100" />
+        <el-table-column prop="ycms" label="工程师对异常的描述" width="2700" />
+        <el-table-column prop="ycxxqr" label="工程师确认的异常现象" width="200" />
+        <el-table-column prop="ycyygl" label="异常原因归类" width="100" />
+        <el-table-column prop="cbyyfx" label="初步原因分析" width="800" />
+        <el-table-column prop="ycid" label="异常EQUIPID" width="150" />
+        <el-table-column prop="ycms" label="设备/菜单临时措施" width="2700" />
+        <el-table-column prop="sftzowner" label="是否通知产品OWNER/FMA" width="300" />
+        <el-table-column prop="c1" label="工程师异常放行" width="150" />
+        <el-table-column prop="c2" label="工程师返工" width="150" />
+        <el-table-column prop="c3" label="工程师报废" width="150" />
+        <el-table-column prop="c4" label="工程师正常放行" width="150" />
+        <el-table-column prop="ycclgcs" label="处理工程师" width="100" />
+        <el-table-column prop="ycqrQrzgQrrq" label="处理日期" width="100" />
+        <el-table-column prop="cpownerQryj" label="确认意见" width="500" />
+        <el-table-column prop="cpownerYcdj" label="异常等级" width="100" />
+        <el-table-column prop="z1" label="再处理异常放行" width="150" />
+        <el-table-column prop="z2" label="再处理返工" width="150" />
+        <el-table-column prop="z3" label="再处理在处理报废" width="150" />
+        <el-table-column prop="z4" label="再处理正常放行" width="150" />
+        <el-table-column prop="cpowmerQzyx" label="产品潜在影响" width="100" />
+        <el-table-column prop="cpownerSfxyzrbmyyfx" label="是否需要责任部门原因分析" width="200" />
+        <el-table-column prop="cpownerSfkmrb" label="是否开MRB" width="100" />
+        <el-table-column prop="cponwerName" label="确认工程师" width="100" />
+        <el-table-column prop="cpownerRq" label="确认日期" width="100" />
+        <el-table-column label="表单状态" width="100" />
+        <el-table-column label="是否挂起" width="100" />
+        <el-table-column label="被谁拒绝" width="100" />
+        <el-table-column label="过程" width="100" />
+        <el-table-column prop="location" label="责任部门一" width="100" />
+        <el-table-column prop="c1" label="报废" width="100" />
+        <el-table-column prop="c2" label="返工" width="100" />
+        <el-table-column prop="c3" label="异常放行" width="100" />
+        <el-table-column prop="c4" label="正常放行" width="100" />
+        <el-table-column label="原因六大类" width="100" />
+        <el-table-column prop="ycclBm" label="责任部门二" width="100" />
+        <el-table-column prop="z1" label="报废" width="100" />
+        <el-table-column prop="z2" label="返工" width="100" />
+        <el-table-column prop="z3" label="异常放行" width="100" />
+        <el-table-column prop="z4" label="正常放行" width="100" />
+        <el-table-column label="原因六大类" width="100" />
+        <el-table-column label="备注" width="100" />
+    </el-table>-->
                  <!--                <TableInfo :tableData="formData" />-->
                  <!--                <TableInfo :tableData="formData" v-show="dialog_visible" >查询</TableInfo>-->
              </el-tab-pane>
@@ -370,7 +370,7 @@
             };
             return {
                 tableID: 'T1',
-                total: 100,
+                total: 1000,
                 headerCellStyle: {
                 background: '#9ACD32', height: '250', color: '#000000', border: '1px solid tan', 'text-align': 'center'
                 },
@@ -381,7 +381,6 @@
                 'text-align': 'center'
                 },
                 form: {
-
                     f_Yc_Odd: "", //异常单号
                     f_LOT: "", //批号             4
                     f_Pro: "", //工艺

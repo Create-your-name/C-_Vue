@@ -65,6 +65,30 @@ const routes = [
         path: '/Scrap',
         component: () => import('@/view/Table/ScrapInfo.vue'),
     },
-    
+    {
+        name: '/工程',
+        path: '/EnginneeRing',
+        component: () => import('@/view/Table/EnginneeRing.vue'),
+    },
+    {
+        name: '/短流程',
+        path: '/ShootLoop',
+        component: () => import('@/view/Table/ShootLoop.vue'),
+    },
+    {
+        name: '/工艺限制',
+        path: '/ProcessConstra',
+        component: () => import('@/view/Table/ProcessConstra.vue'),
+    },
+    {
+        name: '/产出表',
+        path: '/WaferOutTableDay',
+        component: () => import('@/view/Charts/Table/WaferOutTableDay.vue'),
+    },
+    {
+        name: '/投入表',
+        path: '/WaferStartTableDay',
+        component: () => import('@/view/Charts/Table/WaferStartTableDay.vue'),
+    },
 ];
 export default routes

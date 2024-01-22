@@ -19,7 +19,7 @@ public partial class RepActl15min
 
     public decimal? Endmainqty { get; set; }
 
-    public DateTime? Createtime { get; set; }
+    public DateTime Createtime { get; set; }
 
     public DateTime? Starttime { get; set; }
 

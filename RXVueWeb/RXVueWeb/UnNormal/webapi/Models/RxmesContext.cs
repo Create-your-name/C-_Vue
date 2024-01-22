@@ -20,7 +20,7 @@ public partial class RxmesContext : DbContext
     public virtual DbSet<CustProductSetting> CustProductSettings { get; set; }
     public virtual DbSet<Fwwiptransaction> Fwwiptransactions { get; set; }
     public virtual DbSet<Fwlot> Fwlots { get; set; }
-
+    public virtual DbSet<CustEqpConstraint> CustEqpConstraints { get; set; }
     public virtual DbSet<Fwuserprofile> Fwuserprofiles { get; set; }
     public virtual DbSet<CustEqpSptDatum> CustEqpSptData { get; set; }
     public virtual DbSet<FwProcessSpec> FwProcessSpecs { get; set; }
@@ -34,6 +34,104 @@ public partial class RxmesContext : DbContext
         modelBuilder
             .HasDefaultSchema("RXMES")
             .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<CustEqpConstraint>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("CUST_EQP_CONSTRAINT");
+
+            entity.Property(e => e.Ckord)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("CKORD");
+            entity.Property(e => e.CstDes)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("CST_DES");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("DESCRIPTION");
+            entity.Property(e => e.Docid)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("DOCID");
+            entity.Property(e => e.Doctp)
+                .HasMaxLength(4)
+                .IsUnicode(false)
+                .HasColumnName("DOCTP");
+            entity.Property(e => e.Ectp)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("ECTP");
+            entity.Property(e => e.EffectiveD)
+                .HasColumnType("DATE")
+                .HasColumnName("EFFECTIVE_D");
+            entity.Property(e => e.EnterD)
+                .HasColumnType("DATE")
+                .HasColumnName("ENTER_D");
+            entity.Property(e => e.Eqpgroup)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("EQPGROUP");
+            entity.Property(e => e.Eqpid)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("EQPID");
+            entity.Property(e => e.ExpireD)
+                .HasColumnType("DATE")
+                .HasColumnName("EXPIRE_D");
+            entity.Property(e => e.Lotid)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("LOTID");
+            entity.Property(e => e.Process)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("PROCESS");
+            entity.Property(e => e.Product)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCT");
+            entity.Property(e => e.Recipe)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("RECIPE");
+            entity.Property(e => e.Seqid)
+                .HasColumnType("NUMBER")
+                .HasColumnName("SEQID");
+            entity.Property(e => e.Stage)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("STAGE");
+            entity.Property(e => e.Status)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("STATUS");
+            entity.Property(e => e.Step)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("STEP");
+            entity.Property(e => e.Subplan)
+                .HasMaxLength(30)
+                .IsUnicode(false)
+                .HasColumnName("SUBPLAN");
+            entity.Property(e => e.Sysid)
+                .HasMaxLength(35)
+                .IsUnicode(false)
+                .HasColumnName("SYSID");
+            entity.Property(e => e.Userid)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("USERID");
+        });
+        modelBuilder.HasSequence("CORESEQUENCE");
+        modelBuilder.HasSequence("EQPSEQUENCE");
+        modelBuilder.HasSequence("NEWCORESEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("NEWEQPSEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("PARTITIONSEQUENCE");
+        modelBuilder.HasSequence("WIPSEQUENCE").IsCyclic();
 
         modelBuilder.Entity<Fwuserprofile>(entity =>
         {

@@ -20,6 +20,7 @@ public partial class Rxrept2Context: DbContext
     public virtual DbSet<BCapagroupMove> BCapagroupMoves { get; set; }
     public virtual DbSet<RepActlH> RepActlHs { get; set; }
 
+    public virtual DbSet<RepChangepriTmp> RepChangepriTmps { get; set; }
     public virtual DbSet<SpllotDesc> SpllotDescs { get; set; }
     public virtual DbSet<Monthplan> Monthplans { get; set; }
     public virtual DbSet<RepActlHAll> RepActlHAlls { get; set; }
@@ -36,6 +37,163 @@ public partial class Rxrept2Context: DbContext
         modelBuilder
             .HasDefaultSchema("RXREP2")
             .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<RepChangepriTmp>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("REP_CHANGEPRI_TMP");
+
+            entity.HasIndex(e => e.Lotid, "REP_CHANGEPRI_TMP_IDX");
+
+            entity.Property(e => e.Change)
+                .HasColumnType("NUMBER")
+                .HasColumnName("CHANGE");
+            entity.Property(e => e.Diffe)
+                .HasColumnType("NUMBER")
+                .HasColumnName("DIFFE");
+            entity.Property(e => e.Flowstep)
+                .HasColumnType("NUMBER")
+                .HasColumnName("FLOWSTEP");
+            entity.Property(e => e.ForeTheoct)
+                .HasColumnType("NUMBER")
+                .HasColumnName("FORE_THEOCT");
+            entity.Property(e => e.Foretime)
+                .HasColumnType("DATE")
+                .HasColumnName("FORETIME");
+            entity.Property(e => e.Foretime1)
+                .HasColumnType("DATE")
+                .HasColumnName("FORETIME1");
+            entity.Property(e => e.Foretime2)
+                .HasColumnType("DATE")
+                .HasColumnName("FORETIME2");
+            entity.Property(e => e.Lotid)
+                .HasMaxLength(12)
+                .IsUnicode(false)
+                .HasColumnName("LOTID");
+            entity.Property(e => e.NowTheoct)
+                .HasColumnType("NUMBER")
+                .HasColumnName("NOW_THEOCT");
+            entity.Property(e => e.Outdate)
+                .HasColumnType("DATE")
+                .HasColumnName("OUTDATE");
+            entity.Property(e => e.Partid)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PARTID");
+            entity.Property(e => e.Partname)
+                .HasMaxLength(29)
+                .IsUnicode(false)
+                .HasColumnName("PARTNAME");
+            entity.Property(e => e.Ppforetime)
+                .HasColumnType("DATE")
+                .HasColumnName("PPFORETIME");
+            entity.Property(e => e.Qty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("QTY");
+            entity.Property(e => e.Ratio)
+                .HasColumnType("NUMBER")
+                .HasColumnName("RATIO");
+            entity.Property(e => e.Repdate)
+                .HasColumnType("DATE")
+                .HasColumnName("REPDATE");
+            entity.Property(e => e.Reqdtime)
+                .HasColumnType("DATE")
+                .HasColumnName("REQDTIME");
+            entity.Property(e => e.Stage)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("STAGE");
+            entity.Property(e => e.Stageratio)
+                .HasColumnType("NUMBER")
+                .HasColumnName("STAGERATIO");
+            entity.Property(e => e.Starttime)
+                .HasColumnType("DATE")
+                .HasColumnName("STARTTIME");
+            entity.Property(e => e.TotTheoct)
+                .HasColumnType("NUMBER")
+                .HasColumnName("TOT_THEOCT");
+        });
+        modelBuilder.HasSequence("APQP_ABNORMAL_SEQ").IsCyclic();
+        modelBuilder.HasSequence("APQP_SEQ").IsCyclic();
+        modelBuilder.HasSequence("CHECKSEQ");
+        modelBuilder.HasSequence("DAY_MASTER_SEQ");
+        modelBuilder.HasSequence("EPC_CLI_COL_NAME_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_COL_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_ENV_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_FDF_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_FMT_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_JOB_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_NODE_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_PROGR_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_REP_USERS_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_CLI_SVC_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("EPC_COLLECTION_ID");
+        modelBuilder.HasSequence("EPC_MVIEW_ID");
+        modelBuilder.HasSequence("EPC_VIEW_ID");
+        modelBuilder.HasSequence("EVT_NOTIFY_SEQ");
+        modelBuilder.HasSequence("EVT_OPERATORS_SEQ");
+        modelBuilder.HasSequence("EVT_PROFILE_SEQ");
+        modelBuilder.HasSequence("FACE_ABNORMITY_SEQ");
+        modelBuilder.HasSequence("FUTA_SEQUENCE").IsCyclic();
+        modelBuilder.HasSequence("MICROSOFTSEQDTPROPERTIES");
+        modelBuilder.HasSequence("MONTH_MASTER_SEQ");
+        modelBuilder.HasSequence("PM_APS3_CONFIRM_SEQ");
+        modelBuilder.HasSequence("PM_APS3_DATA_SEQ");
+        modelBuilder.HasSequence("PM_BASIC_DATA_SEQ");
+        modelBuilder.HasSequence("QUARTER_MASTER_SEQ");
+        modelBuilder.HasSequence("S_DIFF_DISPATCH_SEQ");
+        modelBuilder.HasSequence("SMACTUALPARAMETERSEQUENCE");
+        modelBuilder.HasSequence("SMAGENTJOBSEQUENCE");
+        modelBuilder.HasSequence("SMARCHIVESEQUENCE");
+        modelBuilder.HasSequence("SMCONSOLESOSETTINGSEQUENCE");
+        modelBuilder.HasSequence("SMDATABASESEQUENCE");
+        modelBuilder.HasSequence("SMDBAUTHSEQUENCE");
+        modelBuilder.HasSequence("SMDEFAUTHSEQUENCE");
+        modelBuilder.HasSequence("SMDISTRIBUTIONSETSEQUENCE");
+        modelBuilder.HasSequence("SMFOLDERSEQUENCE");
+        modelBuilder.HasSequence("SMFORMALPARAMETERSEQUENCE");
+        modelBuilder.HasSequence("SMGLOBALCONFIGURATIONSEQUENCE");
+        modelBuilder.HasSequence("SMHOSTAUTHSEQUENCE");
+        modelBuilder.HasSequence("SMHOSTSEQUENCE");
+        modelBuilder.HasSequence("SMINSTALLATIONSEQUENCE");
+        modelBuilder.HasSequence("SMLOGMESSAGESEQUENCE");
+        modelBuilder.HasSequence("SMMONTHLYENTRYSEQUENCE");
+        modelBuilder.HasSequence("SMMONTHWEEKENTRYSEQUENCE");
+        modelBuilder.HasSequence("SMOMSTRINGSEQUENCE");
+        modelBuilder.HasSequence("SMP_BRM_ID").IsCyclic();
+        modelBuilder.HasSequence("SMP_JOB_ID_").IsCyclic();
+        modelBuilder.HasSequence("SMP_LONG_ID");
+        modelBuilder.HasSequence("SMP_SERVICE_SEQ");
+        modelBuilder.HasSequence("SMP_VTM_CHART_DEFN_SEQ");
+        modelBuilder.HasSequence("SMP_VTM_UDCHART_DEFN_SEQ");
+        modelBuilder.HasSequence("SMPACKAGESEQUENCE");
+        modelBuilder.HasSequence("SMPARALLELJOBSEQUENCE");
+        modelBuilder.HasSequence("SMPARALLELOPERATIONSEQUENCE");
+        modelBuilder.HasSequence("SMPARALLELSTATEMENTSEQUENCE");
+        modelBuilder.HasSequence("SMPRODUCTATTRIBUTESEQUENCE");
+        modelBuilder.HasSequence("SMPRODUCTSEQUENCE");
+        modelBuilder.HasSequence("SMRELEASESEQUENCE");
+        modelBuilder.HasSequence("SMRUNSEQUENCE");
+        modelBuilder.HasSequence("SMSCHEDULESEQUENCE");
+        modelBuilder.HasSequence("SMSHAREDORACLECLIENTSEQUENCE");
+        modelBuilder.HasSequence("SMSHAREDORACLECONFIGSEQUENCE");
+        modelBuilder.HasSequence("SMTABLESPACESEQUENCE");
+        modelBuilder.HasSequence("SMTEMPORARYSEQUENCE");
+        modelBuilder.HasSequence("SMVCENDPOINTSEQUENCE");
+        modelBuilder.HasSequence("SMWEEKLYENTRYSEQUENCE");
+        modelBuilder.HasSequence("TIME_SEQ");
+        modelBuilder.HasSequence("VBZ$CHANGE_PLAN_NAMES_SEQ");
+        modelBuilder.HasSequence("VBZ$DB_OBJ_NAMES_SEQ");
+        modelBuilder.HasSequence("VBZ$DIRECTIVES_SEQ");
+        modelBuilder.HasSequence("VBZ$EXEMPLARS_SEQ");
+        modelBuilder.HasSequence("VBZ$TRANS_ID_SEQ");
+        modelBuilder.HasSequence("WEEK_MASTER_SEQ");
+        modelBuilder.HasSequence("WHH_SEQ").IncrementsBy(10);
+        modelBuilder.HasSequence("XP_JOURNAL_SEQ").IsCyclic();
+        modelBuilder.HasSequence("XP_REP_CONTROL_SEQUENCE");
+        modelBuilder.HasSequence("XP_SQL_ID_SEQUENCE");
+
 
         modelBuilder.Entity<SpllotDesc>(entity =>
         {

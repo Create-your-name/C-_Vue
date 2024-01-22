@@ -18,6 +18,8 @@ public partial class RxrepContext : DbContext
     public virtual DbSet<WtDynamicctreport> WtDynamicctreports { get; set; }
     public virtual DbSet<VMfgHoldLastest> VMfgHoldLastests { get; set; }
     public virtual DbSet<RptScrap> RptScraps { get; set; }
+
+    public virtual DbSet<RptWipRxgz> RptWipRxgzs { get; set; }
     public virtual DbSet<VOeeSumV2011> VOeeSumV2011s { get; set; }
     public virtual DbSet<CostScrap0> CostScrap0s { get; set; }
     public virtual DbSet<RepEqpsStartEnd> RepEqpsStartEnds { get; set; }
@@ -34,6 +36,277 @@ public partial class RxrepContext : DbContext
         modelBuilder
             .HasDefaultSchema("RXREP")
             .UseCollation("USING_NLS_COMP");
+
+        modelBuilder.Entity<RptWipRxgz>(entity =>
+        {
+            entity.HasKey(e => e.Lotid);
+
+            entity.ToTable("RPT_WIP_RXGZ");
+
+            entity.HasIndex(e => e.Productname, "RPT_WIP_RXGZ_IDX1");
+
+            entity.Property(e => e.Lotid)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LOTID");
+            entity.Property(e => e.AbcType)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("ABC_TYPE");
+            entity.Property(e => e.Balphoto)
+                .HasColumnType("NUMBER")
+                .HasColumnName("BALPHOTO");
+            entity.Property(e => e.Beflag)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("BEFLAG");
+            entity.Property(e => e.Currentrule)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("CURRENTRULE");
+            entity.Property(e => e.Cusno)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("CUSNO");
+            entity.Property(e => e.Cusprod)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("CUSPROD");
+            entity.Property(e => e.Defernum)
+                .HasColumnType("NUMBER")
+                .HasColumnName("DEFERNUM");
+            entity.Property(e => e.Duedate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("DUEDATE");
+            entity.Property(e => e.Feprocess)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("FEPROCESS");
+            entity.Property(e => e.Feprocessver)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("FEPROCESSVER");
+            entity.Property(e => e.Feproduct)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("FEPRODUCT");
+            entity.Property(e => e.Feproductver)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasColumnName("FEPRODUCTVER");
+            entity.Property(e => e.Handle)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("HANDLE");
+            entity.Property(e => e.Holdby)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("HOLDBY");
+            entity.Property(e => e.Holdreason)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("HOLDREASON");
+            entity.Property(e => e.Lasttrackouttime)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LASTTRACKOUTTIME");
+            entity.Property(e => e.Lasttransactiontime)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LASTTRANSACTIONTIME");
+            entity.Property(e => e.Layerno)
+                .HasColumnType("NUMBER")
+                .HasColumnName("LAYERNO");
+            entity.Property(e => e.Lotcomment)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("LOTCOMMENT");
+            entity.Property(e => e.Lotcreatedate)
+                .HasColumnType("DATE")
+                .HasColumnName("LOTCREATEDATE");
+            entity.Property(e => e.Lotowner)
+                .HasMaxLength(60)
+                .IsUnicode(false)
+                .HasColumnName("LOTOWNER");
+            entity.Property(e => e.Lotstartdate)
+                .HasMaxLength(18)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("LOTSTARTDATE");
+            entity.Property(e => e.Lotstatus)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LOTSTATUS");
+            entity.Property(e => e.Lottype)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("LOTTYPE");
+            entity.Property(e => e.Neqpgroup)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("NEQPGROUP");
+            entity.Property(e => e.Newduedate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("NEWDUEDATE");
+            entity.Property(e => e.Nrecipe)
+                .HasMaxLength(128)
+                .IsUnicode(false)
+                .HasColumnName("NRECIPE");
+            entity.Property(e => e.Nstage)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("NSTAGE");
+            entity.Property(e => e.Nstepdesc)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("NSTEPDESC");
+            entity.Property(e => e.Nstepname)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("NSTEPNAME");
+            entity.Property(e => e.Nstepseq)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("NSTEPSEQ");
+            entity.Property(e => e.Ordertype)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("ORDERTYPE");
+            entity.Property(e => e.OutFlag)
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("OUT_FLAG");
+            entity.Property(e => e.Plancompletedate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PLANCOMPLETEDATE");
+            entity.Property(e => e.Planinvdate)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("PLANINVDATE");
+            entity.Property(e => e.Planname)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("PLANNAME");
+            entity.Property(e => e.Planversion)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("PLANVERSION");
+            entity.Property(e => e.Plocation)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("PLOCATION");
+            entity.Property(e => e.Priority)
+                .HasColumnType("NUMBER(38)")
+                .HasColumnName("PRIORITY");
+            entity.Property(e => e.ProcessPlatform)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("PROCESS_PLATFORM");
+            entity.Property(e => e.Processtime)
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSTIME");
+            entity.Property(e => e.Processtype)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("PROCESSTYPE");
+            entity.Property(e => e.Productname)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCTNAME");
+            entity.Property(e => e.Productversion)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("PRODUCTVERSION");
+            entity.Property(e => e.Recipe)
+                .HasMaxLength(128)
+                .IsUnicode(false)
+                .HasColumnName("RECIPE");
+            entity.Property(e => e.Repdate)
+                .HasColumnType("DATE")
+                .HasColumnName("REPDATE");
+            entity.Property(e => e.Resourcetype)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("RESOURCETYPE");
+            entity.Property(e => e.Stage)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("STAGE");
+            entity.Property(e => e.Startqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("STARTQTY");
+            entity.Property(e => e.Stepcategory)
+                .HasMaxLength(45)
+                .IsUnicode(false)
+                .HasColumnName("STEPCATEGORY");
+            entity.Property(e => e.Stepdescription)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("STEPDESCRIPTION");
+            entity.Property(e => e.Steplocation)
+                .HasMaxLength(40)
+                .IsUnicode(false)
+                .HasColumnName("STEPLOCATION");
+            entity.Property(e => e.Stepname)
+                .HasMaxLength(80)
+                .IsUnicode(false)
+                .HasColumnName("STEPNAME");
+            entity.Property(e => e.StepseqRw)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasColumnName("STEPSEQ_RW");
+            entity.Property(e => e.TodayMoves)
+                .HasColumnType("NUMBER")
+                .HasColumnName("TODAY_MOVES");
+            entity.Property(e => e.Wbcnt)
+                .HasColumnType("NUMBER")
+                .HasColumnName("WBCNT");
+            entity.Property(e => e.WbcntBal)
+                .HasColumnType("NUMBER")
+                .HasColumnName("WBCNT_BAL");
+            entity.Property(e => e.Wipqty)
+                .HasColumnType("NUMBER")
+                .HasColumnName("WIPQTY");
+            entity.Property(e => e.Wo)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("WO");
+            entity.Property(e => e.YqUpdatedate)
+                .HasColumnType("DATE")
+                .HasColumnName("YQ_UPDATEDATE");
+        });
+        modelBuilder.HasSequence("ACTIONSTUDYNO");
+        modelBuilder.HasSequence("CPT_SEQ");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_SHIPTONO");
+        modelBuilder.HasSequence("CUST_CONSIGNMENT_TONO");
+        modelBuilder.HasSequence("DEPT_ONDUTYNO");
+        modelBuilder.HasSequence("DEV_MESSAGE_NO");
+        modelBuilder.HasSequence("DEVELOP_EQUIP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_EQUIPJOBNO");
+        modelBuilder.HasSequence("DEVELOP_ONDUTYNO");
+        modelBuilder.HasSequence("DEVELOP_SYS_NO");
+        modelBuilder.HasSequence("HEF_PRODUCT_INFO_ID");
+        modelBuilder.HasSequence("HFE_LOT_INFO_ID");
+        modelBuilder.HasSequence("IFAB_PURVIEWNO");
+        modelBuilder.HasSequence("IFAB_UPLOADNO");
+        modelBuilder.HasSequence("IFAB_USERNO");
+        modelBuilder.HasSequence("IT_WORKPLANNO");
+        modelBuilder.HasSequence("MODULE_STEPCODENO");
+        modelBuilder.HasSequence("OEE_CAPAGROUP_SNO");
+        modelBuilder.HasSequence("PMS_USER_NO");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_ID");
+        modelBuilder.HasSequence("REP_FMA_EXAMQUESTION_MA_ID");
 
         modelBuilder.Entity<RptScrap>(entity =>
         {
